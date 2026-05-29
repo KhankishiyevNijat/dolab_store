@@ -281,19 +281,19 @@ async function loadProduct() {
   // Breadcrumb
   document.getElementById('breadcrumb').innerHTML = `
     <a href="index.html">Ana səhifə</a> ›
-    <a href="category.html?cat=${product.category_name || ''}">${product.category_name || 'Kateqoriya'}</a> ›
-    <span>${product.title}</span>
+    <a href="category.html?cat=${encodeURIComponent(product.category_name || '')}">${escapeHtml(product.category_name || 'Kateqoriya')}</a> ›
+    <span>${escapeHtml(product.title)}</span>
   `;
 
   // Build images
   const images = product.images && product.images.length > 0 ? product.images : [];
   const mainImgHtml = images.length > 0
-    ? `<img id="mainImg" src="${getProductImageUrl(images[0])}" alt="${product.title}">`
+    ? `<img id="mainImg" src="${safeUrl(getProductImageUrl(images[0]))}" alt="${escapeHtml(product.title)}">`
     : `<span>📦</span>`;
 
   const thumbsHtml = images.map((img, i) => `
-    <div class="thumb ${i===0?'active':''}" onclick="switchImg(this,'${getProductImageUrl(img)}')">
-      <img src="${getProductImageUrl(img)}" alt="">
+    <div class="thumb ${i===0?'active':''}" onclick="switchImg(this,'${escapeHtml(getProductImageUrl(img))}')">
+      <img src="${safeUrl(getProductImageUrl(img))}" alt="">
     </div>
   `).join('');
 
@@ -316,8 +316,8 @@ async function loadProduct() {
 
     <div class="product-info">
       <div>
-        <div class="product-brand">${product.brand || ''}</div>
-        <h1 class="product-title">${product.title}</h1>
+        <div class="product-brand">${escapeHtml(product.brand || '')}</div>
+        <h1 class="product-title">${escapeHtml(product.title)}</h1>
         ${product.is_sold ? '<span class="sold-badge">Satıldı</span>' : ''}
       </div>
 
@@ -331,15 +331,15 @@ async function loadProduct() {
 
       <div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Vəziyyət</p>
-        <span class="condition-badge">${conditionLabels[product.condition] || product.condition || '—'}</span>
+        <span class="condition-badge">${conditionLabels[product.condition] || escapeHtml(product.condition) || '—'}</span>
       </div>
 
       <div class="details-table">
-        <div><div class="detail-label">Ölçü</div><div class="detail-value">${product.size || '—'}</div></div>
-        <div><div class="detail-label">Brend</div><div class="detail-value">${product.brand || '—'}</div></div>
-        <div><div class="detail-label">Rəng</div><div class="detail-value">${product.color || '—'}</div></div>
-        <div><div class="detail-label">Kateqoriya</div><div class="detail-value">${product.category_name || '—'}</div></div>
-        <div><div class="detail-label">Məkan</div><div class="detail-value">${product.location || 'Bakı'}</div></div>
+        <div><div class="detail-label">Ölçü</div><div class="detail-value">${escapeHtml(product.size || '—')}</div></div>
+        <div><div class="detail-label">Brend</div><div class="detail-value">${escapeHtml(product.brand || '—')}</div></div>
+        <div><div class="detail-label">Rəng</div><div class="detail-value">${escapeHtml(product.color || '—')}</div></div>
+        <div><div class="detail-label">Kateqoriya</div><div class="detail-value">${escapeHtml(product.category_name || '—')}</div></div>
+        <div><div class="detail-label">Məkan</div><div class="detail-value">${escapeHtml(product.location || 'Bakı')}</div></div>
         <div><div class="detail-label">Əlavə edilib</div><div class="detail-value">${new Date(product.created_at).toLocaleDateString('en-GB')}</div></div>
       </div>
 
@@ -359,19 +359,19 @@ async function loadProduct() {
 
       <hr class="divider">
 
-      <a class="seller-card" href="profile.html?id=${product.seller_id}">
+      <a class="seller-card" href="profile.html?id=${encodeURIComponent(product.seller_id)}">
         <div class="seller-avatar">
           ${product.seller_avatar
-            ? `<img src="${product.seller_avatar}" alt="${product.seller_name}">`
+            ? `<img src="${safeUrl(product.seller_avatar)}" alt="${escapeHtml(product.seller_name)}">`
             : '👤'
           }
         </div>
         <div>
-          <div class="seller-name">${product.seller_name || 'İstifadəçi'}</div>
+          <div class="seller-name">${escapeHtml(product.seller_name || 'İstifadəçi')}</div>
           <div class="seller-meta">
-            ${product.seller_rating ? '⭐ ' + product.seller_rating + ' · ' : ''}
-            ${product.seller_sales || 0} satış ·
-            ${product.seller_location || 'Bakı'}
+            ${product.seller_rating ? '⭐ ' + escapeHtml(product.seller_rating) + ' · ' : ''}
+            ${escapeHtml(product.seller_sales || 0)} satış ·
+            ${escapeHtml(product.seller_location || 'Bakı')}
           </div>
         </div>
         <svg class="seller-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
@@ -380,7 +380,7 @@ async function loadProduct() {
       ${product.description ? `
         <div>
           <h3 style="font-size:20px;margin-bottom:10px;color:var(--navy);">Təsvir</h3>
-          <p class="product-desc">${product.description}</p>
+          <p class="product-desc">${escapeHtml(product.description)}</p>
         </div>
       ` : ''}
 
