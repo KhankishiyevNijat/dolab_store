@@ -240,7 +240,7 @@ async function loadStats() {
   if (pendingUsers?.length) {
     pendingUsers.forEach(u => {
       html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div><span style="font-size:12px;color:var(--muted);">👤 İstifadəçi</span><div style="font-size:14px;color:var(--navy);">${u.full_name || 'İsimsiz'}</div></div>
+        <div><span style="font-size:12px;color:var(--muted);">👤 İstifadəçi</span><div style="font-size:14px;color:var(--navy);">${escapeHtml(u.full_name || 'İsimsiz')}</div></div>
         <div style="display:flex;gap:6px;">
           <button class="btn-approve" onclick="approveProfile('${u.id}', true)">Təsdiqlə</button>
           <button class="btn-reject" onclick="approveProfile('${u.id}', false)">Rədd et</button>
@@ -251,7 +251,7 @@ async function loadStats() {
   if (pendingBlogs?.length) {
     pendingBlogs.forEach(b => {
       html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div><span style="font-size:12px;color:var(--muted);">📝 Blog</span><div style="font-size:14px;color:var(--navy);">${b.title}</div></div>
+        <div><span style="font-size:12px;color:var(--muted);">📝 Blog</span><div style="font-size:14px;color:var(--navy);">${escapeHtml(b.title)}</div></div>
         <div style="display:flex;gap:6px;">
           <button class="btn-verify" onclick="verifyBlog('${b.id}', true)">Yayımla</button>
           <a class="btn-view" href="blog-post.html?id=${b.id}" target="_blank">Bax</a>
@@ -262,7 +262,7 @@ async function loadStats() {
   if (unreadContacts?.length) {
     unreadContacts.forEach(c => {
       html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div><span style="font-size:12px;color:var(--muted);">✉️ Əlaqə</span><div style="font-size:14px;color:var(--navy);">${c.name || 'İsimsiz'} — ${c.subject || 'Mövzusuz'}</div></div>
+        <div><span style="font-size:12px;color:var(--muted);">✉️ Əlaqə</span><div style="font-size:14px;color:var(--navy);">${escapeHtml(c.name || 'İsimsiz')} — ${escapeHtml(c.subject || 'Mövzusuz')}</div></div>
         <button onclick="showSection('contacts',null)" style="font-family:inherit;font-size:12px;color:var(--olive);background:none;border:none;cursor:pointer;">Bax →</button>
       </div>`;
     });
@@ -291,9 +291,9 @@ function renderProfiles(list) {
     </div>` +
     list.map(p => `
     <div class="admin-row" style="grid-template-columns:2fr 2fr 1fr 1fr 1fr;">
-      <div>${p.full_name || '—'}</div>
-      <div style="font-size:12px;color:var(--muted);">${p.id.substring(0,8)}...</div>
-      <div>${p.location || 'Bakı'}</div>
+      <div>${escapeHtml(p.full_name || '—')}</div>
+      <div style="font-size:12px;color:var(--muted);">${escapeHtml(p.id.substring(0,8))}...</div>
+      <div>${escapeHtml(p.location || 'Bakı')}</div>
       <div><span class="badge ${p.is_approved ? 'badge-approved' : 'badge-pending'}">${p.is_approved ? '✅ Aktiv' : '⏳ Gözləyir'}</span></div>
       <div style="display:flex;gap:6px;">
         ${!p.is_approved ? `<button class="btn-approve" onclick="approveProfile('${p.id}',true)">Təsdiqlə</button>` : `<button class="btn-reject" onclick="approveProfile('${p.id}',false)">Blokla</button>`}
@@ -334,9 +334,9 @@ function renderBlogs(list) {
     </div>` +
     list.map(b => `
     <div class="admin-row" style="grid-template-columns:3fr 1fr 1fr 1fr 1fr;">
-      <div style="font-weight:400;">${b.title}</div>
-      <div style="font-size:12px;">${b.author?.full_name || '—'}</div>
-      <div style="font-size:12px;">${b.category || '—'}</div>
+      <div style="font-weight:400;">${escapeHtml(b.title)}</div>
+      <div style="font-size:12px;">${escapeHtml(b.author?.full_name || '—')}</div>
+      <div style="font-size:12px;">${escapeHtml(b.category || '—')}</div>
       <div><span class="badge ${b.is_verified ? 'badge-approved' : 'badge-pending'}">${b.is_verified ? '✅ Yayımlandı' : '⏳ Gözləyir'}</span></div>
       <div style="display:flex;gap:6px;">
         <button class="btn-verify" onclick="verifyBlog('${b.id}',${!b.is_verified})">${b.is_verified ? 'Gizlət' : 'Yayımla'}</button>
@@ -374,14 +374,14 @@ async function loadContacts() {
     allContacts.map((c,i) => `
     <div>
       <div class="admin-row" style="grid-template-columns:1.5fr 2fr 2fr 1fr 1fr;cursor:pointer;" onclick="toggleContact(${i})">
-        <div>${c.name || '—'}</div>
-        <div style="font-size:12px;">${c.email || '—'}</div>
-        <div style="font-size:12px;">${c.subject || '—'}</div>
+        <div>${escapeHtml(c.name || '—')}</div>
+        <div style="font-size:12px;">${escapeHtml(c.email || '—')}</div>
+        <div style="font-size:12px;">${escapeHtml(c.subject || '—')}</div>
         <div style="font-size:12px;">${new Date(c.created_at).toLocaleDateString('en-GB')}</div>
         <div><span class="badge ${c.is_read ? 'badge-approved' : 'badge-pending'}">${c.is_read ? 'Oxundu' : 'Yeni'}</span></div>
       </div>
       <div class="msg-detail" id="contact-detail-${i}">
-        <strong>Mesaj:</strong><br>${c.message}
+        <strong>Mesaj:</strong><br>${escapeHtml(c.message)}
         ${!c.is_read ? `<br><br><button onclick="markContactRead('${c.id}',${i})" style="font-family:inherit;font-size:12px;color:var(--olive);background:none;border:1.5px solid var(--olive);border-radius:6px;padding:5px 12px;cursor:pointer;">Oxundu işarələ</button>` : ''}
       </div>
     </div>`).join('');
@@ -421,10 +421,10 @@ async function loadMessages() {
   t.innerHTML = threadList.map((th, i) => `
     <div class="chat-thread">
       <div class="chat-thread-header" onclick="toggleThread(${i})">
-        <div class="chat-thread-avatar">${th.sender?.avatar_url ? `<img src="${th.sender.avatar_url}">` : '👤'}</div>
+        <div class="chat-thread-avatar">${th.sender?.avatar_url ? `<img src="${safeUrl(th.sender.avatar_url)}">` : '👤'}</div>
         <div style="flex:1;">
-          <div style="font-size:14px;color:var(--navy);">${th.sender?.full_name || '?'} → ${th.receiver?.full_name || '?'}</div>
-          <div style="font-size:12px;color:var(--muted);">📦 ${th.product?.title || 'Məhsul'} · ${th.msgs.length} mesaj</div>
+          <div style="font-size:14px;color:var(--navy);">${escapeHtml(th.sender?.full_name || '?')} → ${escapeHtml(th.receiver?.full_name || '?')}</div>
+          <div style="font-size:12px;color:var(--muted);">📦 ${escapeHtml(th.product?.title || 'Məhsul')} · ${th.msgs.length} mesaj</div>
         </div>
         <div style="font-size:12px;color:var(--muted);">${new Date(th.lastTime).toLocaleDateString('en-GB')}</div>
       </div>
@@ -436,7 +436,7 @@ async function loadMessages() {
             if (p.type === 'offer') content = `💰 Qiymət təklifi: ₼${p.amount} (${p.status})`;
             else if (p.type === 'image') content = '📷 Şəkil';
           } catch(e) {}
-          return `<div class="chat-msg ${m.sender_id === th.msgs[0].sender_id ? 'sent' : 'recv'}">${content}<div style="font-size:10px;opacity:0.7;margin-top:2px;">${new Date(m.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div></div>`;
+          return `<div class="chat-msg ${m.sender_id === th.msgs[0].sender_id ? 'sent' : 'recv'}">${escapeHtml(content)}<div style="font-size:10px;opacity:0.7;margin-top:2px;">${new Date(m.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div></div>`;
         }).join('')}
       </div>
     </div>`).join('');
@@ -461,10 +461,10 @@ function renderProducts(list) {
     </div>` +
     list.map(p => `
     <div class="admin-row" style="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;">
-      <div>${p.title}</div>
-      <div style="font-size:12px;">${p.seller_name || '—'}</div>
-      <div style="font-family:'Amatic SC',cursive;font-size:18px;color:var(--olive);">₼${p.price}</div>
-      <div style="font-size:12px;">${p.category_name || '—'}</div>
+      <div>${escapeHtml(p.title)}</div>
+      <div style="font-size:12px;">${escapeHtml(p.seller_name || '—')}</div>
+      <div style="font-family:'Amatic SC',cursive;font-size:18px;color:var(--olive);">₼${escapeHtml(p.price)}</div>
+      <div style="font-size:12px;">${escapeHtml(p.category_name || '—')}</div>
       <div><span class="badge ${p.is_sold ? 'badge-rejected' : 'badge-approved'}">${p.is_sold ? 'Satıldı' : 'Aktiv'}</span></div>
       <div style="display:flex;gap:6px;">
         <a class="btn-view" href="product.html?id=${p.id}" target="_blank">Bax</a>
