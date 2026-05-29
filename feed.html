@@ -242,13 +242,13 @@ let taggedProduct = null;
     currentProfile = profile;
     document.getElementById('createPostBox').style.display = 'block';
     if (profile?.avatar_url) {
-      document.getElementById('createAvatar').innerHTML = `<img src="${profile.avatar_url}">`;
+      document.getElementById('createAvatar').innerHTML = `<img src="${safeUrl(profile.avatar_url)}">`;
     }
     // Load user's products for tagging
     const { data: prods } = await db.from('products').select('id,title').eq('seller_id', currentUser.id).eq('is_active', true);
     const sel = document.getElementById('productSelectEl');
     (prods || []).forEach(p => {
-      sel.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+      sel.innerHTML += `<option value="${escapeHtml(p.id)}">${escapeHtml(p.title)}</option>`;
     });
   } else {
     document.getElementById('loginPrompt').style.display = 'block';
@@ -305,17 +305,17 @@ function renderPost(p, userLikes) {
 
   const imgsHtml = imgs.length > 0 ? `
     <div class="post-images ${imgClass}">
-      ${imgs.slice(0,3).map(img => `<img src="${getProductImageUrl(img)}" onclick="openLightbox('${getProductImageUrl(img)}')" loading="lazy">`).join('')}
+      ${imgs.slice(0,3).map(img => `<img src="${safeUrl(getProductImageUrl(img))}" onclick="openLightbox('${jsString(getProductImageUrl(img))}')" loading="lazy">`).join('')}
     </div>` : '';
 
   const productHtml = p.product_id ? `
-    <a class="post-product" href="product.html?id=${p.product_id}">
+    <a class="post-product" href="product.html?id=${encodeURIComponent(p.product_id)}">
       ${p.product_images && p.product_images[0]
-        ? `<img class="post-product-img" src="${getProductImageUrl(p.product_images[0])}">`
+        ? `<img class="post-product-img" src="${safeUrl(getProductImageUrl(p.product_images[0]))}">`
         : `<div class="post-product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">👗</div>`}
       <div class="post-product-info">
-        <div class="post-product-title">${p.product_title || ''}</div>
-        <div class="post-product-price">${p.product_price ? '₼' + p.product_price : ''}</div>
+        <div class="post-product-title">${escapeHtml(p.product_title || '')}</div>
+        <div class="post-product-price">${p.product_price ? '₼' + escapeHtml(p.product_price) : ''}</div>
       </div>
     </a>` : '';
 
@@ -324,16 +324,16 @@ function renderPost(p, userLikes) {
   return `
     <div class="post-card" id="post_${p.id}">
       <div class="post-header">
-        <a class="post-avatar" href="profile.html?id=${p.user_id}">
-          ${p.author_avatar ? `<img src="${p.author_avatar}">` : '👤'}
+        <a class="post-avatar" href="profile.html?id=${encodeURIComponent(p.user_id)}">
+          ${p.author_avatar ? `<img src="${safeUrl(p.author_avatar)}">` : '👤'}
         </a>
         <div>
-          <a class="post-author" href="profile.html?id=${p.user_id}">${p.author_name || 'İstifadəçi'}</a>
+          <a class="post-author" href="profile.html?id=${encodeURIComponent(p.user_id)}">${escapeHtml(p.author_name || 'İstifadəçi')}</a>
           <div class="post-time">${timeAgo(p.created_at)}</div>
         </div>
-        ${isOwn ? `<button class="post-more" onclick="deletePost('${p.id}')">⋯</button>` : ''}
+        ${isOwn ? `<button class="post-more" onclick="deletePost('${jsString(p.id)}')">⋯</button>` : ''}
       </div>
-      ${p.content ? `<div class="post-content">${p.content}</div>` : ''}
+      ${p.content ? `<div class="post-content">${escapeHtml(p.content)}</div>` : ''}
       ${imgsHtml}
       ${productHtml}
       <div class="post-actions">
@@ -399,20 +399,20 @@ async function loadComments(postId) {
     return `
     <div class="comment-item" id="comment_${c.id}">
       <div class="comment-avatar">
-        ${c.author?.avatar_url ? `<img src="${c.author.avatar_url}">` : '👤'}
+        ${c.author?.avatar_url ? `<img src="${safeUrl(c.author.avatar_url)}">` : '👤'}
       </div>
       <div class="comment-bubble" style="flex:1;">
-        <div class="comment-author">${c.author?.full_name || 'İstifadəçi'}</div>
-        <div class="comment-text" id="comment_text_${c.id}">${c.content}</div>
+        <div class="comment-author">${escapeHtml(c.author?.full_name || 'İstifadəçi')}</div>
+        <div class="comment-text" id="comment_text_${c.id}">${escapeHtml(c.content)}</div>
         <div class="comment-editing" id="comment_edit_${c.id}">
-          <input class="comment-edit-input" id="comment_edit_input_${c.id}" value="${c.content.replace(/"/g, '&quot;')}">
-          <button class="comment-edit-save" onclick="saveComment('${c.id}','${postId}')">✓</button>
-          <button class="comment-edit-cancel" onclick="cancelEdit('${c.id}')">✕</button>
+          <input class="comment-edit-input" id="comment_edit_input_${c.id}" value="${escapeHtml(c.content)}">
+          <button class="comment-edit-save" onclick="saveComment('${jsString(c.id)}','${jsString(postId)}')">✓</button>
+          <button class="comment-edit-cancel" onclick="cancelEdit('${jsString(c.id)}')">✕</button>
         </div>
         ${isOwn ? `
         <div class="comment-actions">
-          <button class="comment-action-btn" onclick="startEdit('${c.id}')">Düzəlt</button>
-          <button class="comment-action-btn del" onclick="deleteComment('${c.id}','${postId}')">Sil</button>
+          <button class="comment-action-btn" onclick="startEdit('${jsString(c.id)}')">Düzəlt</button>
+          <button class="comment-action-btn del" onclick="deleteComment('${jsString(c.id)}','${jsString(postId)}')">Sil</button>
         </div>` : ''}
       </div>
     </div>`;
@@ -485,7 +485,7 @@ function addPostImages(input) {
       const preview = document.getElementById('createImgsPreview');
       preview.innerHTML += `
         <div class="create-img-thumb" id="img_thumb_${idx}">
-          <img src="${e.target.result}">
+          <img src="${safeUrl(e.target.result)}">
           <button class="create-img-remove" onclick="removePostImg(${idx})">×</button>
         </div>`;
     };
@@ -512,7 +512,7 @@ function tagProduct(sel) {
   taggedProduct = val;
   document.getElementById('createProductTag').innerHTML = `
     <div class="create-product-tag">
-      🏷️ ${text}
+      🏷️ ${escapeHtml(text)}
       <button onclick="taggedProduct=null;document.getElementById('createProductTag').innerHTML='';document.getElementById('productSelectEl').value=''">×</button>
     </div>`;
   document.getElementById('postProductSelect').style.display = 'none';

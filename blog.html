@@ -226,16 +226,16 @@ async function loadPosts() {
   }
 
   grid.innerHTML = posts.map(p => `
-    <a class="blog-card" href="blog-post.html?id=${p.id}" style="${!p.is_verified ? 'opacity:0.65;' : ''}">
+    <a class="blog-card" href="blog-post.html?id=${encodeURIComponent(p.id)}" style="${!p.is_verified ? 'opacity:0.65;' : ''}">
       <div class="blog-thumb">
-        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : getBlogEmoji(p.category)}
-        ${p.category ? `<span class="blog-category">${p.category}</span>` : ''}
+        ${p.cover_image ? `<img src="${safeUrl(p.cover_image)}" alt="${escapeHtml(p.title)}">` : getBlogEmoji(p.category)}
+        ${p.category ? `<span class="blog-category">${escapeHtml(p.category)}</span>` : ''}
         ${!p.is_verified ? '<span style="position:absolute;top:14px;right:14px;background:#856000;color:white;font-size:11px;padding:4px 10px;border-radius:20px;">⏳ Gözləyir</span>' : ''}
       </div>
       <div class="blog-body">
         <div class="blog-meta">${new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}</div>
-        <h2>${p.title}</h2>
-        <p>${p.excerpt || p.content.substring(0, 120) + '...'}</p>
+        <h2>${escapeHtml(p.title)}</h2>
+        <p>${escapeHtml(p.excerpt || p.content.substring(0, 120) + '...')}</p>
         <span class="read-more">${p.is_verified ? 'Daha ətraflı oxu →' : '⏳ Admin təsdiqini gözləyir'}</span>
       </div>
     </a>

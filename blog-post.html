@@ -264,15 +264,16 @@ async function loadPost() {
   const dateStr = new Date(post.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})
 
   document.getElementById('postContent').innerHTML = `
-    ${post.category ? `<span class="post-category">${post.category}</span>` : ''}
-    <h1 class="post-title">${post.title}</h1>
+    ${post.category ? `<span class="post-category">${escapeHtml(post.category)}</span>` : ''}
+    <h1 class="post-title">${escapeHtml(post.title)}</h1>
     <div class="post-meta">
       <span>📅 ${dateStr}</span>
     </div>
     ${post.cover_image ? `
       <div class="post-cover">
-        <img src="${post.cover_image}" alt="${post.title}">
+        <img src="${safeUrl(post.cover_image)}" alt="${escapeHtml(post.title)}">
       </div>` : ''}
+    <!-- post.content qəsdən zəngin HTML kimi göstərilir (yalnız admin təsdiqindən sonra yayımlanır) -->
     <div class="post-content">${post.content}</div>
     <hr class="post-divider">
     <div class="post-footer">
@@ -303,12 +304,12 @@ async function loadRelated(excludeId) {
   if (!posts || posts.length === 0) return;
   document.getElementById('relatedSection').style.display = 'block';
   document.getElementById('relatedGrid').innerHTML = posts.map(p => `
-    <a class="related-card" href="blog-post.html?id=${p.id}">
+    <a class="related-card" href="blog-post.html?id=${encodeURIComponent(p.id)}">
       <div class="related-thumb">
-        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : (p.category === 'Moda' ? '👗' : p.category === 'Davamlılıq' ? '♻️' : '✨')}
+        ${p.cover_image ? `<img src="${safeUrl(p.cover_image)}" alt="${escapeHtml(p.title)}">` : (p.category === 'Moda' ? '👗' : p.category === 'Davamlılıq' ? '♻️' : '✨')}
       </div>
       <div class="related-body">
-        <div class="related-title">${p.title}</div>
+        <div class="related-title">${escapeHtml(p.title)}</div>
         <div class="related-date">${new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short'})}</div>
       </div>
     </a>

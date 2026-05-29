@@ -9,6 +9,38 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ── HTML escape helper (XSS qarşısının alınması)
+// İstifadəçi/DB məzmunu innerHTML-ə yazılmazdan əvvəl bundan keçirilməlidir.
+function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ── İnline onclick="fn('...')" içində tək-dırnaqlı JS sətri üçün təhlükəsiz qaçış
+// (HTML atributu cüt dırnaqla əhatə olunduğu fərz edilir)
+function jsString(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '\\u003C')
+    .replace(/\r/g, '')
+    .replace(/\n/g, '\\n');
+}
+
+// ── URL təmizləyici: yalnız http(s) və data:image icazəlidir (javascript: bloklanır)
+function safeUrl(value) {
+  if (!value) return '';
+  const url = String(value).trim();
+  if (/^https?:\/\//i.test(url) || /^data:image\//i.test(url)) return escapeHtml(url);
+  return '';
+}
+
 // ── Auth helper: cari user
 async function getCurrentUser() {
   const { data: { user } } = await db.auth.getUser();
@@ -80,19 +112,19 @@ function createProductCard(product) {
     : null;
 
   return `
-    <a class="card" href="product.html?id=${product.id}">
+    <a class="card" href="product.html?id=${encodeURIComponent(product.id)}">
       <div class="card-img">
         ${img
-          ? `<img src="${img}" alt="${product.title}" style="width:100%;height:100%;object-fit:cover;object-position:top;">`
+          ? `<img src="${safeUrl(img)}" alt="${escapeHtml(product.title)}" style="width:100%;height:100%;object-fit:cover;object-position:top;">`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#f3efe9,#e8d5c4);">👗</div>`
         }
         ${discount ? `<span class="card-badge badge-sale">−${discount}%</span>` : '<span class="card-badge badge-new">Yeni</span>'}
-        <div class="fav-btn" onclick="toggleFav(event,'${product.id}')">${product.is_favorited ? '❤️' : '🤍'}</div>
+        <div class="fav-btn" onclick="toggleFav(event,'${escapeHtml(product.id)}')">${product.is_favorited ? '❤️' : '🤍'}</div>
       </div>
       <div class="card-body">
-        <div class="card-brand">${product.brand || ''}</div>
-        <div class="card-name">${product.title}</div>
-        ${product.size ? `<span class="card-size">${product.size}</span>` : ''}
+        <div class="card-brand">${escapeHtml(product.brand || '')}</div>
+        <div class="card-name">${escapeHtml(product.title)}</div>
+        ${product.size ? `<span class="card-size">${escapeHtml(product.size)}</span>` : ''}
         <div class="card-footer">
           <div>
             <span class="card-price">${formatPrice(product.price)}</span>

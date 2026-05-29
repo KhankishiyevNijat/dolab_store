@@ -259,7 +259,7 @@ async function loadProfile() {
   document.title = (profile.full_name || 'Profil') + ' — Dolab.az';
 
   const avatarHtml = profile.avatar_url
-    ? `<img src="${profile.avatar_url}" alt="${profile.full_name}">`
+    ? `<img src="${safeUrl(profile.avatar_url)}" alt="${escapeHtml(profile.full_name)}">`
     : '👤';
 
   const approvedBadge = isOwnProfile && !profile.is_approved
@@ -279,10 +279,10 @@ async function loadProfile() {
   document.getElementById('profileHeader').innerHTML = `
     <div class="avatar">${avatarHtml}</div>
     <div class="profile-info">
-      <h1 class="profile-name">${profile.full_name || 'İstifadəçi'}</h1>
+      <h1 class="profile-name">${escapeHtml(profile.full_name || 'İstifadəçi')}</h1>
       <div class="profile-meta">
-        <span>📍 ${profile.location || 'Bakı'}</span>
-        ${profile.rating ? `<span>⭐ ${profile.rating} reytinq</span>` : ''}
+        <span>📍 ${escapeHtml(profile.location || 'Bakı')}</span>
+        ${profile.rating ? `<span>⭐ ${escapeHtml(profile.rating)} reytinq</span>` : ''}
         <span>🕐 ${new Date(profile.created_at).toLocaleDateString('en-GB', {year:'numeric',month:'long'})}</span>
         ${approvedBadge}
       </div>
@@ -295,8 +295,8 @@ async function loadProfile() {
     <div class="profile-actions">
       ${isOwnProfile
         ? `<button class="btn-logout" onclick="doLogout()">Çıxış</button>`
-        : `<button class="btn-follow" id="followBtn" onclick="toggleFollow('${profileId}')" style="${isFollowing ? 'background:var(--cream2);color:var(--navy);border:1.5px solid var(--border);' : ''}">${isFollowing ? '✓ İzlənir' : 'İzlə'}</button>
-           <button class="btn-msg" onclick="openDirectMsg('${profileId}','${(profile.full_name||'İstifadəçi').replace(/'/g,String.fromCharCode(39)+'\\'+String.fromCharCode(39)+String.fromCharCode(39))}')">💬 Mesaj</button>`
+        : `<button class="btn-follow" id="followBtn" onclick="toggleFollow('${jsString(profileId)}')" style="${isFollowing ? 'background:var(--cream2);color:var(--navy);border:1.5px solid var(--border);' : ''}">${isFollowing ? '✓ İzlənir' : 'İzlə'}</button>
+           <button class="btn-msg" onclick="openDirectMsg('${jsString(profileId)}','${jsString(profile.full_name||'İstifadəçi')}')">💬 Mesaj</button>`
       }
     </div>
   `;
@@ -307,7 +307,7 @@ async function loadProfile() {
     document.getElementById('messagesTab').style.display = 'block';
     loadMessages(profileId);
     if (profile.avatar_url) {
-      document.getElementById('editAvatar').innerHTML = '<img src="' + profile.avatar_url + '" style="width:100%;height:100%;object-fit:cover;">';
+      document.getElementById('editAvatar').innerHTML = '<img src="' + safeUrl(profile.avatar_url) + '" style="width:100%;height:100%;object-fit:cover;">';
     }
     document.getElementById('editName').value = profile.full_name || '';
     document.getElementById('editPhone').value = profile.phone || '';
@@ -351,17 +351,17 @@ async function loadSold(sellerId) {
     return;
   }
   grid.innerHTML = data.map(p => `
-    <a class="card" href="product.html?id=${p.id}" style="position:relative;">
+    <a class="card" href="product.html?id=${encodeURIComponent(p.id)}" style="position:relative;">
       <div class="card-img" style="position:relative;">
         ${p.images && p.images[0]
-          ? `<img src="${getProductImageUrl(p.images[0])}" style="width:100%;height:100%;object-fit:cover;">`
+          ? `<img src="${safeUrl(getProductImageUrl(p.images[0]))}" style="width:100%;height:100%;object-fit:cover;">`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#f3efe9,#e8d5c4);">📦</div>`
         }
         <div class="sold-overlay"><span class="sold-tag">Satıldı</span></div>
       </div>
       <div class="card-body">
-        <div class="card-brand">${p.brand || ''}</div>
-        <div class="card-name">${p.title}</div>
+        <div class="card-brand">${escapeHtml(p.brand || '')}</div>
+        <div class="card-name">${escapeHtml(p.title)}</div>
         <div class="card-footer"><span class="card-price">${formatPrice(p.price)}</span></div>
       </div>
     </a>
@@ -415,18 +415,18 @@ async function loadMessages(userId) {
   });
 
   container.innerHTML = Object.values(threads).map(t => `
-    <div class="msg-thread ${t.unread > 0 ? 'msg-unread' : ''}" onclick="openChat('${t.sender_id}','${t.product_id}','${t.sender?.full_name || 'İstifadəçi'}')">
+    <div class="msg-thread ${t.unread > 0 ? 'msg-unread' : ''}" onclick="openChat('${jsString(t.sender_id)}','${jsString(t.product_id)}','${jsString(t.sender?.full_name || 'İstifadəçi')}')">
       <div class="msg-thread-header">
         <div class="msg-thread-avatar">
-          ${t.sender?.avatar_url ? `<img src="${t.sender.avatar_url}">` : '👤'}
+          ${t.sender?.avatar_url ? `<img src="${safeUrl(t.sender.avatar_url)}">` : '👤'}
         </div>
         <div>
-          <div class="msg-thread-name">${t.sender?.full_name || 'İstifadəçi'}</div>
-          <div class="msg-thread-product">📦 ${t.products?.title || 'Məhsul'}</div>
+          <div class="msg-thread-name">${escapeHtml(t.sender?.full_name || 'İstifadəçi')}</div>
+          <div class="msg-thread-product">📦 ${escapeHtml(t.products?.title || 'Məhsul')}</div>
         </div>
         <div class="msg-thread-time">${new Date(t.created_at).toLocaleDateString('az-AZ')}</div>
       </div>
-      <div class="msg-thread-text">${t.content.substring(0, 100)}${t.content.length > 100 ? '...' : ''}</div>
+      <div class="msg-thread-text">${escapeHtml(t.content.substring(0, 100))}${t.content.length > 100 ? '...' : ''}</div>
     </div>
   `).join('');
 }
@@ -449,14 +449,14 @@ async function openChat(senderId, productId, senderName) {
   const { data: product } = await db.from('products').select('id,title').eq('id', productId).single();
 
   container.innerHTML = `
-    <button class="chat-back" onclick="loadMessages('${currentUser.id}')">← Geriyə</button>
+    <button class="chat-back" onclick="loadMessages('${jsString(currentUser.id)}')">← Geriyə</button>
     <div class="chat-header">
       <div style="font-size:22px;">💬</div>
       <div>
-        <div style="font-size:15px;font-weight:400;color:var(--navy);">${senderName}</div>
-        <div style="font-size:12px;color:var(--olive);">📦 ${product?.title || 'Məhsul'}</div>
+        <div style="font-size:15px;font-weight:400;color:var(--navy);">${escapeHtml(senderName)}</div>
+        <div style="font-size:12px;color:var(--olive);">📦 ${escapeHtml(product?.title || 'Məhsul')}</div>
       </div>
-      <a href="product.html?id=${productId}" style="margin-left:auto;font-size:13px;color:var(--olive);text-decoration:none;">Məhsula bax →</a>
+      <a href="product.html?id=${encodeURIComponent(productId)}" style="margin-left:auto;font-size:13px;color:var(--olive);text-decoration:none;">Məhsula bax →</a>
     </div>
     <div class="chat-messages" id="chatMsgs">
       ${(msgs || []).map(m => `
@@ -470,15 +470,15 @@ async function openChat(senderId, productId, senderName) {
                   let statusHtml = '';
                   if (p.status === 'accepted') statusHtml = '<div><span class="offer-status offer-accepted">✅ Qəbul edildi</span></div>';
                   else if (p.status === 'rejected') statusHtml = '<div><span class="offer-status offer-rejected">❌ Rədd edildi</span></div>';
-                  else if (!isOwn) statusHtml = `<div class="offer-actions"><button class="offer-accept" onclick="respondToOffer('${m.id}',true,'${m.sender_id}','${productId}','${senderName}')">✅ Qəbul et</button><button class="offer-reject" onclick="respondToOffer('${m.id}',false,'${m.sender_id}','${productId}','${senderName}')">❌ Rədd et</button></div>`;
+                  else if (!isOwn) statusHtml = `<div class="offer-actions"><button class="offer-accept" onclick="respondToOffer('${jsString(m.id)}',true,'${jsString(m.sender_id)}','${jsString(productId)}','${jsString(senderName)}')">✅ Qəbul et</button><button class="offer-reject" onclick="respondToOffer('${jsString(m.id)}',false,'${jsString(m.sender_id)}','${jsString(productId)}','${jsString(senderName)}')">❌ Rədd et</button></div>`;
                   else statusHtml = '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Cavab gözlənilir...</div>';
-                  return `<div class="offer-bubble ${isOwn?'sent':''}"><div class="offer-label">💰 Qiymət təklifi</div><div class="offer-amount">₼${p.amount}</div>${statusHtml}</div>`;
+                  return `<div class="offer-bubble ${isOwn?'sent':''}"><div class="offer-label">💰 Qiymət təklifi</div><div class="offer-amount">₼${escapeHtml(p.amount)}</div>${statusHtml}</div>`;
                 }
               } catch(e) {}
               if (p.type === 'image' && p.url) {
-                return '<img src="' + p.url + '" alt="Şəkil" onclick="window.open(this.src,\'_blank\')" style="cursor:zoom-in;max-width:200px;max-height:200px;border-radius:10px;display:block;margin-bottom:4px;">';
+                return '<img src="' + safeUrl(p.url) + '" alt="Şəkil" onclick="window.open(this.src,\'_blank\')" style="cursor:zoom-in;max-width:200px;max-height:200px;border-radius:10px;display:block;margin-bottom:4px;">';
               }
-              return m.content;
+              return escapeHtml(m.content);
             })()}
             <div class="chat-bubble-time">${new Date(m.created_at).toLocaleTimeString('az-AZ', {hour:'2-digit',minute:'2-digit'})}</div>
           </div>
@@ -486,24 +486,24 @@ async function openChat(senderId, productId, senderName) {
       `).join('')}
     </div>
     <div style="margin-bottom:8px;">
-      <button onclick="showOfferInput('${senderId}','${productId}','${senderName}')" style="font-family:inherit;font-size:13px;color:var(--olive);background:none;border:1.5px solid var(--olive);border-radius:8px;padding:7px 14px;cursor:pointer;">💰 Qiymət təklif et</button>
+      <button onclick="showOfferInput('${jsString(senderId)}','${jsString(productId)}','${jsString(senderName)}')" style="font-family:inherit;font-size:13px;color:var(--olive);background:none;border:1.5px solid var(--olive);border-radius:8px;padding:7px 14px;cursor:pointer;">💰 Qiymət təklif et</button>
     </div>
     <div class="offer-input-wrap" id="offerInputWrap">
       <label>Nə qədər təklif edirsiz? (₼)</label>
       <input class="offer-price-input" type="number" id="offerPrice" placeholder="0">
-      <button class="offer-send-btn" onclick="sendOfferMsg('${senderId}','${productId}','${senderName}')">Təklifi göndər</button>
+      <button class="offer-send-btn" onclick="sendOfferMsg('${jsString(senderId)}','${jsString(productId)}','${jsString(senderName)}')">Təklifi göndər</button>
     </div>
     <div class="chat-img-preview" id="chatImgPreview">
       <img id="chatImgPreviewImg" src="">
       <button class="chat-img-preview-remove" onclick="removeChatImg()">✕ Şəkli sil</button>
     </div>
-    <input type="file" id="chatImgInput" accept="image/*" onchange="previewChatImg(this,'${senderId}','${productId}','${senderName}')">
+    <input type="file" id="chatImgInput" accept="image/*" onchange="previewChatImg(this,'${jsString(senderId)}','${jsString(productId)}','${jsString(senderName)}')">
     <div class="chat-input-row">
       <div class="chat-img-btn" onclick="document.getElementById('chatImgInput').click()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       </div>
-      <input class="chat-input" id="chatReply" placeholder="Cavab yaz..." onkeydown="if(event.key==='Enter')sendReply('${senderId}','${productId}','${senderName}')">
-      <button class="chat-send" onclick="sendReply('${senderId}','${productId}','${senderName}')">Göndər</button>
+      <input class="chat-input" id="chatReply" placeholder="Cavab yaz..." onkeydown="if(event.key==='Enter')sendReply('${jsString(senderId)}','${jsString(productId)}','${jsString(senderName)}')">
+      <button class="chat-send" onclick="sendReply('${jsString(senderId)}','${jsString(productId)}','${jsString(senderName)}')">Göndər</button>
     </div>
   `;
 
@@ -661,12 +661,12 @@ function openDirectMsg(sellerId, sellerName) {
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
   modal.innerHTML = `
     <div style="background:var(--white);border-radius:16px;padding:28px;width:100%;max-width:480px;">
-      <h3 style="font-size:26px;color:var(--navy);margin-bottom:6px;">${sellerName}</h3>
+      <h3 style="font-size:26px;color:var(--navy);margin-bottom:6px;">${escapeHtml(sellerName)}</h3>
       <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;">Birbaşa mesaj göndər</p>
       <textarea id="directMsgText" style="width:100%;font-family:inherit;font-size:14px;color:var(--navy);background:var(--cream2);border:1.5px solid var(--border);border-radius:10px;padding:14px;outline:none;resize:vertical;min-height:100px;box-sizing:border-box;" placeholder="Mesajınızı yazın..."></textarea>
       <div style="display:flex;gap:10px;margin-top:16px;">
         <button onclick="this.closest('div[style*=fixed]').remove()" style="font-family:inherit;font-size:14px;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 20px;cursor:pointer;">Ləğv et</button>
-        <button onclick="sendDirectMsg('${sellerId}')" style="flex:1;font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:10px;padding:12px;cursor:pointer;">Göndər →</button>
+        <button onclick="sendDirectMsg('${jsString(sellerId)}')" style="flex:1;font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:10px;padding:12px;cursor:pointer;">Göndər →</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -714,7 +714,7 @@ async function loadReviews(sellerId) {
           ${[1,2,3,4,5].map(s => `<button style="font-size:24px;cursor:pointer;opacity:0.4;background:none;border:none;padding:0;" data-val="${s}" onclick="selectStar(${s})">★</button>`).join('')}
         </div>
         <textarea id="reviewText" style="width:100%;font-family:inherit;font-size:14px;color:var(--navy);background:var(--white);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;outline:none;resize:vertical;min-height:80px;box-sizing:border-box;" placeholder="Bu satıcı haqqında rəyinizi yazın..."></textarea>
-        <button onclick="submitReview('${sellerId}')" style="font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:9px;padding:11px 24px;cursor:pointer;margin-top:10px;">Göndər</button>
+        <button onclick="submitReview('${jsString(sellerId)}')" style="font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:9px;padding:11px 24px;cursor:pointer;margin-top:10px;">Göndər</button>
       </div>`;
     }
   }
@@ -740,15 +740,15 @@ async function loadReviews(sellerId) {
     ${list.map(r => `<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
         <div style="width:38px;height:38px;border-radius:50%;background:var(--cream2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0;">
-          ${r.reviewer?.avatar_url ? `<img src="${r.reviewer.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
+          ${r.reviewer?.avatar_url ? `<img src="${safeUrl(r.reviewer.avatar_url)}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
         </div>
         <div>
-          <div style="font-size:14px;color:var(--navy);font-weight:400;">${r.reviewer?.full_name || 'İstifadəçi'}</div>
+          <div style="font-size:14px;color:var(--navy);font-weight:400;">${escapeHtml(r.reviewer?.full_name || 'İstifadəçi')}</div>
           <div style="font-size:12px;color:var(--muted);">${new Date(r.created_at).toLocaleDateString('en-GB')}</div>
         </div>
         <div style="margin-left:auto;font-size:14px;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
       </div>
-      ${r.comment ? `<div style="font-size:14px;color:var(--muted);line-height:1.6;">${r.comment}</div>` : ''}
+      ${r.comment ? `<div style="font-size:14px;color:var(--muted);line-height:1.6;">${escapeHtml(r.comment)}</div>` : ''}
     </div>`).join('')}`;
 }
 
