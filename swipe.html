@@ -264,7 +264,7 @@ function createSwipeCard(p, isTop) {
   card.id = 'swipe_card_' + p.id;
   card.innerHTML = `
     <div class="swipe-card-img">
-      ${img ? `<img src="${img}" alt="${p.title}" draggable="false">` : '👗'}
+      ${img ? `<img src="${safeUrl(img)}" alt="${escapeHtml(p.title)}" draggable="false">` : '👗'}
     </div>
     <div class="swipe-overlay overlay-like" id="overlay_like_${p.id}">
       <div class="overlay-label">BƏYƏNDIM ♥</div>
@@ -276,12 +276,12 @@ function createSwipeCard(p, isTop) {
       <div class="overlay-label">⭐ SEVİMLİ</div>
     </div>
     <div class="swipe-card-body">
-      <div class="swipe-card-brand">${p.brand || ''}</div>
-      <div class="swipe-card-title">${p.title}</div>
+      <div class="swipe-card-brand">${escapeHtml(p.brand || '')}</div>
+      <div class="swipe-card-title">${escapeHtml(p.title)}</div>
       <div class="swipe-card-meta">
         <span class="swipe-card-price">${formatPrice(p.price)}</span>
-        ${p.size ? `<span class="swipe-card-size">${p.size}</span>` : ''}
-        <span class="swipe-card-location">📍 ${p.seller_location || 'Bakı'}</span>
+        ${p.size ? `<span class="swipe-card-size">${escapeHtml(p.size)}</span>` : ''}
+        <span class="swipe-card-location">📍 ${escapeHtml(p.seller_location || 'Bakı')}</span>
       </div>
     </div>`;
 
