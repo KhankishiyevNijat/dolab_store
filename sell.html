@@ -146,7 +146,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Rəng</label>
-          <input class="form-input" type="text" id="color" list="color-list" placeholder="Məs: Qara, Göy, Rəngarəng...">
+          <input class="form-input" type="text" id="color" list="color-list" placeholder="Məs: Qara, Göy, Rəngərəng...">
           <datalist id="color-list">
             <option>Ağ</option>
             <option>Qara</option>
@@ -156,7 +156,7 @@
             <option>Qırmızı</option>
             <option>Çəhrayı</option>
             <option>Boz</option>
-            <option>Rəngarəng / Naxışlı</option>
+            <option>Rəngərəng / Naxışlı</option>
             <option>Qəhvəyi</option>
             <option>Narıncı</option>
             <option>Sarı</option>
@@ -277,7 +277,7 @@
     </div>
     <div class="publish-card">
       <h3>Hazırsınız?</h3>
-      <p>Məhsulunuz yoxlanılandan sonra dərhal elan lövhəsində görünəcək. Komissiya yoxdur.</p>
+      <p>Məhsulunuz yoxlanılandın sonra dərhal elan lövhəsində görünəcək. Komissiya yoxdur.</p>
       <button class="btn-publish-big" id="publishSideBtn" onclick="publishProduct()">Elani yerləşdir</button>
     </div>
   </div>
@@ -370,9 +370,9 @@ async function handleFiles(files) {
       div.className = 'photo-preview';
       div.dataset.path = path;
       div.innerHTML = `
-        <img src="${url}" alt="">
+        <img src="${safeUrl(url)}" alt="">
         ${uploadedImagePaths.length === 1 ? '<span class="main-label">Əsas</span>' : ''}
-        <button class="remove-btn" onclick="removePhoto(this,'${path}')">×</button>
+        <button class="remove-btn" onclick="removePhoto(this,'${jsString(path)}')">×</button>
       `;
       grid.appendChild(div);
     }
