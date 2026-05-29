@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Blog — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .post-wrap { max-width:780px; margin:0 auto; padding:40px 2rem 80px; }
+    .post-back { display:inline-flex; align-items:center; gap:6px; font-size:13.5px; color:var(--olive); text-decoration:none; margin-bottom:28px; }
+    .post-back:hover { color:var(--navy); }
+    .post-category { display:inline-block; background:var(--olive); color:white; font-size:11px; padding:4px 12px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:14px; }
+    .post-title { font-size:52px; color:var(--navy); line-height:1.1; margin-bottom:16px; }
+    .post-meta { font-size:13.5px; color:var(--muted); margin-bottom:28px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .post-cover { width:100%; border-radius:16px; overflow:hidden; margin-bottom:36px; max-height:480px; }
+    .post-cover img { width:100%; height:100%; object-fit:cover; }
+    .post-content { font-size:16px; color:var(--navy); line-height:1.85; white-space:pre-wrap; }
+    .post-content p { margin-bottom:20px; }
+    .post-divider { border:none; border-top:1px solid var(--border); margin:40px 0; }
+    .post-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+    .share-btns { display:flex; gap:10px; }
+    .share-btn { font-family:inherit; font-size:13px; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:8px; padding:8px 16px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all 0.15s; }
+    .share-btn:hover { border-color:var(--olive); color:var(--olive); }
+
+    /* ADMIN EDIT */
+    .admin-actions { display:none; gap:10px; margin-bottom:20px; }
+    .btn-edit-post { font-family:inherit; font-size:13px; color:var(--olive); background:none; border:1.5px solid var(--olive); border-radius:8px; padding:8px 16px; cursor:pointer; }
+    .btn-delete-post { font-family:inherit; font-size:13px; color:#d94f4f; background:none; border:1.5px solid rgba(217,79,79,0.3); border-radius:8px; padding:8px 16px; cursor:pointer; }
+
+    /* EDIT FORM */
+    .edit-form { background:var(--white); border:1.5px solid var(--olive); border-radius:16px; padding:24px; margin-bottom:28px; display:none; }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block; font-size:13px; color:var(--navy); margin-bottom:6px; }
+    .form-input { width:100%; font-family:inherit; font-size:14px; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:9px; padding:10px 14px; outline:none; box-sizing:border-box; }
+    .form-input:focus { border-color:var(--olive); background:var(--white); }
+    textarea.form-input { min-height:200px; resize:vertical; }
+    .btn-save-edit { font-family:inherit; font-size:14px; color:white; background:var(--olive); border:none; border-radius:9px; padding:11px 24px; cursor:pointer; }
+
+    /* RELATED */
+    .related-section { margin-top:56px; }
+    .related-section h3 { font-size:32px; color:var(--navy); margin-bottom:20px; }
+    .related-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:20px; }
+    .related-card { background:var(--white); border:1px solid var(--border); border-radius:14px; overflow:hidden; text-decoration:none; transition:transform 0.2s; display:block; }
+    .related-card:hover { transform:translateY(-3px); }
+    .related-thumb { height:140px; background:linear-gradient(135deg,#f3efe9,#e8d5c4); display:flex; align-items:center; justify-content:center; font-size:36px; overflow:hidden; }
+    .related-thumb img { width:100%; height:100%; object-fit:cover; }
+    .related-body { padding:14px; }
+    .related-title { font-size:18px; color:var(--navy); margin-bottom:6px; line-height:1.3; }
+    .related-date { font-size:12px; color:var(--muted); }
+
+    .skeleton-block { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    @media (max-width:768px) {
+      .post-wrap { padding:20px 14px 80px; }
+      .post-title { font-size:34px; }
+      .post-content { font-size:15px; }
+      .related-grid { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+    <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+      Kataloq
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+    </button>
+    <div class="catalog-dropdown">
+      <div class="dropdown-sub">
+        <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+          🛍️ Məhsullar
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="dropdown-sub-menu">
+          <a href="category.html">Hamısı</a>
+          <a href="category.html?cat=Qadın">👗 Qadın</a>
+          <a href="category.html?cat=Kişi">👔 Kişi</a>
+          <a href="category.html?cat=Dizayner">Brendlər</a>
+          <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+          <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+          <a href="category.html?cat=İdman">🏃 İdman</a>
+          <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+          <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+          <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+          <a href="category.html?cat=Baxım">💄 Baxım</a>
+          <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+          <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+          <a href="category.html?cat=Digər">📦 Digər</a>
+        </div>
+      </div>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-section-label">✨ Xüsusi</div>
+      <a href="auction.html">🔨 Auksiyon</a>
+      <a href="swipe.html">💫 Kəşf et</a>
+      <a href="feed.html">📱 Feed</a>
+    </div>
+  </div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<div class="post-wrap">
+  <a class="post-back" href="blog.html">← Bloga qayıt</a>
+
+  <!-- ADMIN ACTIONS -->
+  <div class="admin-actions" id="adminActions">
+    <button id="verifyBtn" onclick="toggleVerify()" style="display:none;font-family:inherit;font-size:13px;color:white;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;">⏳ Verify et</button>
+    <button class="btn-edit-post" onclick="toggleEditForm()">✏️ Düzəlt</button>
+    <button class="btn-delete-post" onclick="deletePost()">🗑️ Sil</button>
+  </div>
+
+  <!-- EDIT FORM -->
+  <div class="edit-form" id="editForm">
+    <h3 style="font-size:24px;color:var(--navy);margin-bottom:16px;">Postu düzəlt</h3>
+    <div class="form-group">
+      <label class="form-label">Başlıq</label>
+      <input class="form-input" id="editTitle">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Kateqoriya</label>
+      <input class="form-input" id="editCategory">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Qısa xülasə</label>
+      <input class="form-input" id="editExcerpt">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mətn</label>
+      <textarea class="form-input" id="editContent"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Yeni örtük şəkli (istəyə görə)</label>
+      <input type="file" id="editCoverInput" accept="image/*" style="font-family:inherit;font-size:13px;">
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-save-edit" onclick="saveEdit()">Yadda saxla</button>
+      <button onclick="toggleEditForm()" style="font-family:inherit;font-size:14px;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:9px;padding:11px 20px;cursor:pointer;">Ləğv et</button>
+    </div>
+  </div>
+
+  <!-- POST CONTENT -->
+  <div id="postContent">
+    <div class="skeleton-block" style="height:44px;width:40%;margin-bottom:14px;"></div>
+    <div class="skeleton-block" style="height:64px;margin-bottom:20px;"></div>
+    <div class="skeleton-block" style="height:400px;border-radius:16px;margin-bottom:36px;"></div>
+    <div class="skeleton-block" style="height:20px;margin-bottom:12px;"></div>
+    <div class="skeleton-block" style="height:20px;width:80%;margin-bottom:12px;"></div>
+    <div class="skeleton-block" style="height:20px;width:90%;"></div>
+  </div>
+
+  <div class="related-section" id="relatedSection" style="display:none;">
+    <h3>Digər yazılar</h3>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+const postId = new URLSearchParams(window.location.search).get('id');
+if (!postId) location.href = 'blog.html';
+
+let currentPost = null;
+let currentUser = null;
+let isAdmin = false;
+
+(async () => {
+  currentUser = await getCurrentUser();
+  updateNavAuth();
+  if (currentUser) {
+    const { data: profile } = await db.from('profiles').select('is_admin').eq('id', currentUser.id).single();
+    isAdmin = profile?.is_admin === true;
+  }
+  loadPost();
+})();
+
+async function loadPost() {
+  const { data: post } = await db.from('blog_posts').select('*').eq('id', postId).single();
+  if (!post) { location.href = 'blog.html'; return; }
+  currentPost = post;
+
+  document.title = post.title + ' — Dolab.az';
+
+  // Admin check
+  if (isAdmin) {
+    document.getElementById('adminActions').style.display = 'flex';
+    document.getElementById('editTitle').value = post.title;
+    document.getElementById('editCategory').value = post.category || '';
+    document.getElementById('editExcerpt').value = post.excerpt || '';
+    document.getElementById('editContent').value = post.content;
+    const verifyBtn = document.getElementById('verifyBtn');
+    if (verifyBtn) {
+      verifyBtn.style.display = 'inline-flex';
+      verifyBtn.textContent = post.is_verified ? '✅ Verified' : '⏳ Verify et';
+      verifyBtn.style.background = post.is_verified ? '#2ecc71' : '#856000';
+    }
+  }
+  if (!post.is_verified && !isAdmin) {
+    document.getElementById('postContent').innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted);"><h3 style="font-size:28px;color:var(--navy);">Bu post hələ yayımlanmayıb</h3></div>';
+    return;
+  }
+
+  const dateStr = new Date(post.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})
+
+  document.getElementById('postContent').innerHTML = `
+    ${post.category ? `<span class="post-category">${post.category}</span>` : ''}
+    <h1 class="post-title">${post.title}</h1>
+    <div class="post-meta">
+      <span>📅 ${dateStr}</span>
+    </div>
+    ${post.cover_image ? `
+      <div class="post-cover">
+        <img src="${post.cover_image}" alt="${post.title}">
+      </div>` : ''}
+    <div class="post-content">${post.content}</div>
+    <hr class="post-divider">
+    <div class="post-footer">
+      <div style="font-size:14px;color:var(--muted);">Bu yazını bəyəndiniz?</div>
+      <div class="share-btns">
+        <a class="share-btn" onclick="sharePost('whatsapp')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.849L0 24l6.335-1.54C8.04 23.45 9.981 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+          WhatsApp
+        </a>
+        <a class="share-btn" onclick="sharePost('telegram')">Telegram</a>
+        <a class="share-btn" onclick="copyLink()">🔗 Link</a>
+      </div>
+    </div>
+  `;
+
+  loadRelated(post.id);
+}
+
+async function loadRelated(excludeId) {
+  const { data: posts } = await db.from('blog_posts')
+    .select('id,title,cover_image,category,created_at')
+    .eq('is_published', true)
+    .eq('is_verified', true)
+    .neq('id', excludeId)
+    .order('created_at', { ascending: false })
+    .limit(3);
+
+  if (!posts || posts.length === 0) return;
+  document.getElementById('relatedSection').style.display = 'block';
+  document.getElementById('relatedGrid').innerHTML = posts.map(p => `
+    <a class="related-card" href="blog-post.html?id=${p.id}">
+      <div class="related-thumb">
+        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : (p.category === 'Moda' ? '👗' : p.category === 'Davamlılıq' ? '♻️' : '✨')}
+      </div>
+      <div class="related-body">
+        <div class="related-title">${p.title}</div>
+        <div class="related-date">${new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short'})}</div>
+      </div>
+    </a>
+  `).join('');
+}
+
+function toggleEditForm() {
+  const f = document.getElementById('editForm');
+  f.style.display = f.style.display === 'none' || !f.style.display ? 'block' : 'none';
+}
+
+async function saveEdit() {
+  const title = document.getElementById('editTitle').value.trim();
+  const content = document.getElementById('editContent').value.trim();
+  if (!title || !content) { alert('Başlıq və mətn mütləqdir'); return; }
+
+  let coverUrl = currentPost.cover_image;
+  const coverInput = document.getElementById('editCoverInput');
+  if (coverInput.files[0]) {
+    const file = coverInput.files[0];
+    const ext = file.name.split('.').pop();
+    const path = `covers/${Date.now()}.${ext}`;
+    const { error: upErr } = await db.storage.from('blog-images').upload(path, file, { upsert: true });
+    if (!upErr) {
+      const { data } = db.storage.from('blog-images').getPublicUrl(path);
+      coverUrl = data.publicUrl;
+    }
+  }
+
+  await db.from('blog_posts').update({
+    title,
+    excerpt: document.getElementById('editExcerpt').value.trim() || null,
+    content,
+    category: document.getElementById('editCategory').value.trim() || null,
+    cover_image: coverUrl
+  }).eq('id', postId);
+
+  location.reload();
+}
+
+async function toggleVerify() {
+  const newVal = !currentPost.is_verified;
+  await db.from('blog_posts').update({ is_verified: newVal }).eq('id', postId);
+  const btn = document.getElementById('verifyBtn');
+  btn.textContent = newVal ? '✅ Verified' : '⏳ Verify et';
+  btn.style.background = newVal ? '#2ecc71' : '#856000';
+  currentPost.is_verified = newVal;
+  alert(newVal ? '✅ Post yayımlandı!' : '⏳ Post gizlədildi.');
+}
+
+async function deletePost() {
+  if (!confirm('Postu silmək istəyirsiniz?')) return;
+  await db.from('blog_posts').delete().eq('id', postId);
+  location.href = 'blog.html';
+}
+
+function sharePost(platform) {
+  const url = encodeURIComponent(window.location.href);
+  const title = encodeURIComponent(currentPost?.title || '');
+  if (platform === 'whatsapp') window.open(`https://wa.me/?text=${title}%20${url}`, '_blank');
+  else if (platform === 'telegram') window.open(`https://t.me/share/url?url=${url}&text=${title}`, '_blank');
+}
+
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => alert('Link kopyalandı!'));
+}
+</script>
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+</body>
+</html>

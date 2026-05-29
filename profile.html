@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Profil — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .profile-header { background:var(--white); border-bottom:1px solid var(--border); padding:40px 2.5rem 32px; }
+    .profile-header-inner { max-width:1160px; margin:0 auto; display:flex; align-items:flex-start; gap:28px; flex-wrap:wrap; }
+    .avatar { width:96px; height:96px; border-radius:50%; overflow:hidden; border:3px solid var(--border); flex-shrink:0; background:var(--cream2); display:flex; align-items:center; justify-content:center; font-size:40px; cursor:pointer; }
+    .avatar img { width:100%; height:100%; object-fit:cover; }
+    .profile-info { flex:1; }
+    .profile-name { font-size:40px; color:var(--navy); margin-bottom:6px; }
+    .profile-meta { display:flex; flex-wrap:wrap; gap:16px; font-size:13.5px; color:var(--muted); margin-bottom:16px; }
+    .profile-stats { display:flex; gap:32px; flex-wrap:wrap; }
+    .stat-item { text-align:center; }
+    .stat-num { font-family:'Amatic SC',cursive; font-size:30px; font-weight:700; color:var(--navy); line-height:1; }
+    .stat-label { font-size:12px; color:var(--muted); margin-top:3px; }
+    .profile-actions { display:flex; flex-direction:column; gap:10px; align-items:flex-end; margin-left:auto; }
+    .btn-follow { font-family:inherit; font-size:14px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:9px; padding:11px 28px; cursor:pointer; transition:background 0.18s; }
+    .btn-follow:hover { background:var(--olive-dark); }
+    .btn-msg { font-family:inherit; font-size:14px; font-weight:300; color:var(--navy); background:transparent; border:1.5px solid var(--border); border-radius:9px; padding:10px 28px; cursor:pointer; transition:border-color 0.18s; }
+    .btn-msg:hover { border-color:var(--navy); }
+    .btn-logout { font-family:inherit; font-size:13px; font-weight:300; color:#d94f4f; background:transparent; border:1.5px solid rgba(217,79,79,0.3); border-radius:9px; padding:8px 20px; cursor:pointer; }
+    .btn-logout:hover { background:#fff0f0; }
+    .pending-badge { background:#fffbea; border:1px solid #f0e080; border-radius:8px; padding:8px 14px; font-size:13px; color:#856000; }
+
+    .profile-tabs { background:var(--white); border-bottom:1px solid var(--border); padding:0 2.5rem; display:flex; overflow-x:auto; }
+    .tab { font-family:inherit; font-size:14px; font-weight:300; color:var(--muted); padding:14px 22px; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.18s; white-space:nowrap; background:none; border-left:none; border-right:none; border-top:none; }
+    .tab:hover { color:var(--navy); }
+    .tab.active { color:var(--navy); font-weight:400; border-bottom-color:var(--olive); }
+    .profile-content { max-width:1160px; margin:0 auto; padding:36px 2rem 64px; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+    .sold-overlay { position:absolute; inset:0; background:rgba(250,248,245,0.8); display:flex; align-items:center; justify-content:center; }
+    .sold-tag { background:var(--navy); color:white; font-size:12px; padding:5px 14px; border-radius:20px; }
+    .empty-state { text-align:center; padding:48px; color:var(--muted); }
+    .empty-state h3 { font-size:26px; color:var(--navy); margin-bottom:8px; }
+
+    /* Edit profile form */
+    .edit-card { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:28px 32px; max-width:560px; }
+    .edit-card h3 { font-size:26px; color:var(--navy); margin-bottom:20px; }
+    .form-group { margin-bottom:18px; }
+    .form-label { display:block; font-size:13px; font-weight:400; color:var(--navy); margin-bottom:7px; }
+    .form-input { width:100%; font-family:inherit; font-size:14px; font-weight:300; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:9px; padding:12px 14px; outline:none; transition:border-color 0.18s; }
+    .form-input:focus { border-color:var(--olive); background:var(--white); }
+    .btn-save { font-family:inherit; font-size:15px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:10px; padding:13px 32px; cursor:pointer; transition:background 0.18s; }
+    .btn-save:hover { background:var(--olive-dark); }
+
+    /* MESSAGES */
+    .msg-thread { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:12px; cursor:pointer; transition:border-color 0.18s; }
+    .msg-thread:hover { border-color:var(--olive); }
+    .msg-thread-header { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .msg-thread-avatar { width:42px; height:42px; border-radius:50%; background:var(--cream2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; overflow:hidden; }
+    .msg-thread-avatar img { width:100%; height:100%; object-fit:cover; }
+    .msg-thread-name { font-size:15px; font-weight:400; color:var(--navy); }
+    .msg-thread-product { font-size:12px; color:var(--olive); }
+    .msg-thread-time { font-size:12px; color:var(--muted); margin-left:auto; }
+    .msg-thread-text { font-size:13.5px; color:var(--muted); line-height:1.5; }
+    .msg-unread { border-left:3px solid var(--olive); }
+    .msg-unread .msg-thread-text { color:var(--navy); font-weight:400; }
+    .msg-badge { display:inline-flex; align-items:center; justify-content:center; background:#d94f4f; color:white; font-size:10px; width:18px; height:18px; border-radius:50%; margin-left:6px; }
+
+    /* CHAT VIEW */
+    .chat-back { display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--olive); cursor:pointer; margin-bottom:20px; background:none; border:none; font-family:inherit; }
+    .chat-header { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:12px; }
+    .chat-messages { display:flex; flex-direction:column; gap:10px; margin-bottom:16px; max-height:400px; overflow-y:auto; }
+    .chat-bubble { max-width:75%; padding:12px 16px; border-radius:14px; font-size:14px; line-height:1.5; }
+    .chat-bubble.sent { background:var(--olive); color:white; align-self:flex-end; border-bottom-right-radius:4px; }
+    .chat-bubble.received { background:var(--cream2); color:var(--navy); align-self:flex-start; border-bottom-left-radius:4px; }
+    .chat-bubble-time { font-size:11px; opacity:0.7; margin-top:4px; }
+    .chat-input-row { display:flex; gap:10px; }
+    .chat-input { flex:1; font-family:inherit; font-size:14px; font-weight:300; background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; outline:none; transition:border-color 0.18s; }
+    .chat-input:focus { border-color:var(--olive); background:var(--white); }
+    .chat-send { font-family:inherit; font-size:14px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:10px; padding:12px 20px; cursor:pointer; }
+    /* CHAT IMAGE */
+    #chatImgInput { display:none; }
+    .chat-img-btn { width:40px; height:40px; border:1.5px solid var(--border); border-radius:10px; background:var(--cream2); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:border-color 0.18s; }
+    .chat-img-btn:hover { border-color:var(--olive); }
+    .chat-img-preview { width:100%; margin-bottom:8px; display:none; }
+    .chat-img-preview img { max-width:200px; max-height:200px; border-radius:10px; border:1px solid var(--border); }
+    .chat-img-preview-remove { font-size:12px; color:#d94f4f; cursor:pointer; margin-top:4px; display:block; background:none; border:none; font-family:inherit; }
+    .chat-bubble img { max-width:200px; max-height:200px; border-radius:10px; display:block; margin-bottom:4px; }
+
+    #avatarInput { display:none; }
+    .offer-bubble { border:1.5px solid var(--border); border-radius:14px; padding:14px 16px; max-width:260px; background:var(--cream2); display:flex; flex-direction:column; }
+    .offer-bubble.sent { border-color:var(--olive); align-self:flex-end; }
+    .offer-amount { font-family:'Amatic SC',cursive; font-size:28px; font-weight:700; color:var(--olive); }
+    .offer-label { font-size:12px; color:var(--muted); margin-bottom:4px; }
+    .offer-actions { display:flex; gap:8px; margin-top:10px; }
+    .offer-accept { flex:1; font-family:inherit; font-size:13px; color:white; background:#2ecc71; border:none; border-radius:8px; padding:8px; cursor:pointer; }
+    .offer-reject { flex:1; font-family:inherit; font-size:13px; color:white; background:#e74c3c; border:none; border-radius:8px; padding:8px; cursor:pointer; }
+    .offer-status { display:inline-block; font-size:12px; padding:3px 10px; border-radius:20px; margin-top:6px; }
+    .offer-accepted { background:#d4f5e2; color:#1a7a40; }
+    .offer-rejected { background:#fde8e8; color:#c0392b; }
+    .offer-input-wrap { background:var(--cream2); border:1.5px solid var(--olive); border-radius:12px; padding:14px; margin-bottom:10px; display:none; }
+    .offer-input-wrap.show { display:block; }
+    .offer-input-wrap label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+    .offer-price-input { width:100%; font-family:'Amatic SC',cursive; font-size:24px; font-weight:700; color:var(--olive); background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; outline:none; box-sizing:border-box; }
+    .offer-send-btn { width:100%; font-family:inherit; font-size:14px; color:white; background:var(--olive); border:none; border-radius:8px; padding:11px; cursor:pointer; margin-top:8px; }
+    @media (max-width: 768px) {
+      .profile-header { padding: 24px 14px 20px; }
+      .profile-header-inner { flex-direction:column; align-items:center; text-align:center; gap:12px; flex-wrap:nowrap; }
+      .avatar { width:80px; height:80px; font-size:32px; flex-shrink:0; }
+      .profile-info { flex:none; width:100%; }
+      .profile-name { font-size:22px; margin-bottom:6px; }
+      .profile-meta { justify-content:center; gap:8px; font-size:12px; margin-bottom:10px; }
+      .profile-stats { justify-content:center; gap:28px; }
+      .stat-num { font-size:24px; }
+      .stat-label { font-size:11px; }
+      .profile-actions { flex-direction:row; justify-content:center; margin-left:0; align-items:center; gap:8px; width:100%; }
+      .btn-follow, .btn-msg, .btn-logout { padding:9px 20px; font-size:13px; }
+      .profile-tabs { padding:0 4px; }
+      .tab { padding:10px 8px; font-size:11.5px; }
+      .profile-content { padding:16px 12px 80px; }
+      .edit-card { padding:16px 12px; }
+      footer { padding:24px 14px 16px; }
+      .footer-top { flex-direction:column; gap:16px; margin-bottom:20px; }
+      .footer-logo img { height:60px; }
+      .footer-logo p { font-size:12px; }
+      .footer-col h4 { font-size:17px; margin-bottom:10px; }
+      .footer-col a { font-size:12.5px; margin-bottom:7px; }
+      .footer-bottom { padding-top:14px; font-size:11px; flex-direction:column; text-align:center; gap:4px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <button class="-btn">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="search-bar">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<div class="profile-header">
+  <div class="profile-header-inner" id="profileHeader">
+    <div class="avatar">⏳</div>
+    <div class="profile-info">
+      <h1 class="profile-name" id="profileName">Yüklənir...</h1>
+    </div>
+  </div>
+</div>
+
+<div class="profile-tabs" id="profileTabs">
+  <button class="tab active" onclick="showTab('listings',this)">Aktiv elanlar</button>
+  <button class="tab" onclick="showTab('sold',this)">Satılanlar</button>
+  <button class="tab" id="messagesTab" onclick="showTab('messages',this)" style="display:none;">Mesajlar <span id="msgBadge"></span></button>
+  <button class="tab" id="editTab" onclick="showTab('edit',this)" style="display:none;">Profili redaktə et</button>
+  <button class="tab" onclick="showTab('reviews',this)">Rəylər <span id="reviewsBadge"></span></button>
+</div>
+
+<div class="profile-content">
+  <div class="tab-content active" id="tab-listings">
+    <div class="grid" id="listingsGrid">
+      <div style="color:var(--muted);padding:32px;grid-column:1/-1;text-align:center;">Yüklənir...</div>
+    </div>
+  </div>
+  <div class="tab-content" id="tab-sold">
+    <div class="grid" id="soldGrid"></div>
+  </div>
+  <div class="tab-content" id="tab-messages">
+    <div id="messagesContainer"></div>
+  </div>
+  <div class="tab-content" id="tab-reviews"><div id="reviewsContainer"></div></div>
+  <div class="tab-content" id="tab-edit">
+    <div class="edit-card">
+      <h3>Profili redaktə et</h3>
+      <div class="form-group">
+        <label class="form-label">Profil şəkli</label>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div id="editAvatar" style="width:72px;height:72px;border-radius:50%;overflow:hidden;border:2px solid var(--border);background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;">👤</div>
+          <div>
+            <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(this)">
+            <button type="button" onclick="document.getElementById('avatarInput').click()" style="font-family:inherit;font-size:13.5px;font-weight:300;color:var(--olive);background:none;border:1.5px solid var(--olive);border-radius:8px;padding:8px 16px;cursor:pointer;">Şəkil seç</button>
+            <div id="avatarStatus" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ad Soyad</label>
+        <input class="form-input" type="text" id="editName" placeholder="Ad Soyad">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefon</label>
+        <input class="form-input" type="tel" id="editPhone" placeholder="+994 50 000 00 00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Məkan</label>
+        <select class="form-input" id="editLocation">
+          <option>Bakı</option><option>Sumqayıt</option><option>Gəncə</option><option>Lənkəran</option>
+        </select>
+      </div>
+      <button class="btn-save" onclick="saveProfile()">Yadda saxla</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo"><img src="assets/dolablogo.png" alt="Dolab.az"><p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma.</p></div>
+      <div class="footer-col"><h4>Kəşf et</h4><a href="category.html?cat=Qadın">Qadın</a><a href="category.html?cat=Kişi">Kişi</a></div>
+      <div class="footer-col"><h4>Satıcılar</h4><a href="howtosell.html">Necə satmalı</a></div>
+      <div class="footer-col"><h4>Şirkət</h4><a href="haqqimizda.html">Haqqımızda</a><a href="elaqe.html">Əlaqə</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 Dolab.az</span></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const profileIdParam = urlParams.get('id');
+let viewedProfile = null;
+let currentUser = null;
+let isOwnProfile = false;
+
+async function loadProfile() {
+  currentUser = await getCurrentUser();
+
+  const profileId = profileIdParam || (currentUser ? currentUser.id : null);
+  if (!profileId) { location.href = 'login.html'; return; }
+
+  isOwnProfile = currentUser && currentUser.id === profileId;
+
+  const { data: profile } = await db.from('profiles').select('*').eq('id', profileId).single();
+  if (!profile) { location.href = 'index.html'; return; }
+  viewedProfile = profile;
+
+  // Count products
+  const { count: activeCount } = await db.from('products')
+    .select('*', { count: 'exact', head: true })
+    .eq('seller_id', profileId).eq('is_active', true).eq('is_sold', false);
+
+  const { count: soldCount } = await db.from('products')
+    .select('*', { count: 'exact', head: true })
+    .eq('seller_id', profileId).eq('is_sold', true);
+
+  document.title = (profile.full_name || 'Profil') + ' — Dolab.az';
+
+  const avatarHtml = profile.avatar_url
+    ? `<img src="${profile.avatar_url}" alt="${profile.full_name}">`
+    : '👤';
+
+  const approvedBadge = isOwnProfile && !profile.is_approved
+    ? `<span class="pending-badge">⏳ Admin təsdiqini gözləyir</span>`
+    : '';
+
+  // Follow yoxla
+  let isFollowing = false;
+  if (currentUser && !isOwnProfile) {
+    const { data: followData } = await db.from('follows')
+      .select('id').eq('follower_id', currentUser.id).eq('following_id', profileId).maybeSingle();
+    isFollowing = !!followData;
+  }
+  const { count: followersCount } = await db.from('follows')
+    .select('*', { count: 'exact', head: true }).eq('following_id', profileId);
+
+  document.getElementById('profileHeader').innerHTML = `
+    <div class="avatar">${avatarHtml}</div>
+    <div class="profile-info">
+      <h1 class="profile-name">${profile.full_name || 'İstifadəçi'}</h1>
+      <div class="profile-meta">
+        <span>📍 ${profile.location || 'Bakı'}</span>
+        ${profile.rating ? `<span>⭐ ${profile.rating} reytinq</span>` : ''}
+        <span>🕐 ${new Date(profile.created_at).toLocaleDateString('en-GB', {year:'numeric',month:'long'})}</span>
+        ${approvedBadge}
+      </div>
+      <div class="profile-stats">
+        <div class="stat-item"><div class="stat-num">${soldCount || 0}</div><div class="stat-label">Satış</div></div>
+        <div class="stat-item"><div class="stat-num">${activeCount || 0}</div><div class="stat-label">Aktiv elan</div></div>
+        <div class="stat-item"><div class="stat-num">${followersCount || 0}</div><div class="stat-label">İzləyici</div></div>
+      </div>
+    </div>
+    <div class="profile-actions">
+      ${isOwnProfile
+        ? `<button class="btn-logout" onclick="doLogout()">Çıxış</button>`
+        : `<button class="btn-follow" id="followBtn" onclick="toggleFollow('${profileId}')" style="${isFollowing ? 'background:var(--cream2);color:var(--navy);border:1.5px solid var(--border);' : ''}">${isFollowing ? '✓ İzlənir' : 'İzlə'}</button>
+           <button class="btn-msg" onclick="openDirectMsg('${profileId}','${(profile.full_name||'İstifadəçi').replace(/'/g,String.fromCharCode(39)+'\\'+String.fromCharCode(39)+String.fromCharCode(39))}')">💬 Mesaj</button>`
+      }
+    </div>
+  `;
+
+  // Show edit tab for own profile
+  if (isOwnProfile) {
+    document.getElementById('editTab').style.display = 'block';
+    document.getElementById('messagesTab').style.display = 'block';
+    loadMessages(profileId);
+    if (profile.avatar_url) {
+      document.getElementById('editAvatar').innerHTML = '<img src="' + profile.avatar_url + '" style="width:100%;height:100%;object-fit:cover;">';
+    }
+    document.getElementById('editName').value = profile.full_name || '';
+    document.getElementById('editPhone').value = profile.phone || '';
+    if (profile.location) document.getElementById('editLocation').value = profile.location;
+  }
+
+  // Update tab labels
+  document.querySelector('[onclick="showTab(\'listings\',this)"]').textContent = `Aktiv elanlar (${activeCount || 0})`;
+  document.querySelector('[onclick="showTab(\'sold\',this)"]').textContent = `Satılanlar (${soldCount || 0})`;
+
+  loadListings(profileId);
+  loadSold(profileId);
+  loadReviews(profileId);
+}
+
+async function loadListings(sellerId) {
+  const { data } = await db.from('products_with_seller')
+    .select('*')
+    .eq('seller_id', sellerId)
+    .eq('is_sold', false)
+    .order('created_at', { ascending: false });
+
+  const grid = document.getElementById('listingsGrid');
+  if (!data || data.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><h3>Hələ elan yoxdur</h3><p>${isOwnProfile ? 'İlk məhsulunu yerləşdir!' : ''}</p>${isOwnProfile ? '<br><a class="btn-sell" href="sell.html">İndi sat</a>' : ''}</div>`;
+    return;
+  }
+  grid.innerHTML = data.map(createProductCard).join('');
+}
+
+async function loadSold(sellerId) {
+  const { data } = await db.from('products')
+    .select('*')
+    .eq('seller_id', sellerId)
+    .eq('is_sold', true)
+    .order('updated_at', { ascending: false });
+
+  const grid = document.getElementById('soldGrid');
+  if (!data || data.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><h3>Hələ satış yoxdur</h3></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(p => `
+    <a class="card" href="product.html?id=${p.id}" style="position:relative;">
+      <div class="card-img" style="position:relative;">
+        ${p.images && p.images[0]
+          ? `<img src="${getProductImageUrl(p.images[0])}" style="width:100%;height:100%;object-fit:cover;">`
+          : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,#f3efe9,#e8d5c4);">📦</div>`
+        }
+        <div class="sold-overlay"><span class="sold-tag">Satıldı</span></div>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">${p.brand || ''}</div>
+        <div class="card-name">${p.title}</div>
+        <div class="card-footer"><span class="card-price">${formatPrice(p.price)}</span></div>
+      </div>
+    </a>
+  `).join('');
+}
+
+async function saveProfile() {
+  const name     = document.getElementById('editName').value.trim();
+  const phone    = document.getElementById('editPhone').value.trim();
+  const userLocation = document.getElementById('editLocation').value;
+
+  const { error } = await db.from('profiles')
+    .update({ full_name: name, phone, location: userLocation })
+    .eq('id', currentUser.id);
+
+  if (!error) {
+    alert('Profil yeniləndi!');
+    window.location.reload();
+  }
+}
+
+async function loadMessages(userId) {
+  const container = document.getElementById('messagesContainer');
+  if (!container) return;
+
+  // Gələn mesajları yüklə - product və sender məlumatları ilə
+  const { data: msgs } = await db
+    .from('messages')
+    .select('*, products(id,title,images), sender:profiles!messages_sender_id_fkey(id,full_name,avatar_url)')
+    .eq('receiver_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (!msgs || msgs.length === 0) {
+    container.innerHTML = '<div class="empty-state"><h3>Mesaj yoxdur</h3><p>Alıcılar məhsullarınız haqqında sual verdikdə burada görünəcək.</p></div>';
+    return;
+  }
+
+  // Unread sayı
+  const unreadCount = msgs.filter(m => !m.is_read).length;
+  if (unreadCount > 0) {
+    document.getElementById('msgBadge').innerHTML = `<span class="msg-badge">${unreadCount}</span>`;
+  }
+
+  // Thread-ləri sender+product-a görə qruplaşdır
+  const threads = {};
+  msgs.forEach(m => {
+    const key = `${m.sender_id}_${m.product_id}`;
+    if (!threads[key]) threads[key] = { ...m, count: 0, unread: 0 };
+    threads[key].count++;
+    if (!m.is_read) threads[key].unread++;
+  });
+
+  container.innerHTML = Object.values(threads).map(t => `
+    <div class="msg-thread ${t.unread > 0 ? 'msg-unread' : ''}" onclick="openChat('${t.sender_id}','${t.product_id}','${t.sender?.full_name || 'İstifadəçi'}')">
+      <div class="msg-thread-header">
+        <div class="msg-thread-avatar">
+          ${t.sender?.avatar_url ? `<img src="${t.sender.avatar_url}">` : '👤'}
+        </div>
+        <div>
+          <div class="msg-thread-name">${t.sender?.full_name || 'İstifadəçi'}</div>
+          <div class="msg-thread-product">📦 ${t.products?.title || 'Məhsul'}</div>
+        </div>
+        <div class="msg-thread-time">${new Date(t.created_at).toLocaleDateString('az-AZ')}</div>
+      </div>
+      <div class="msg-thread-text">${t.content.substring(0, 100)}${t.content.length > 100 ? '...' : ''}</div>
+    </div>
+  `).join('');
+}
+
+async function openChat(senderId, productId, senderName) {
+  const container = document.getElementById('messagesContainer');
+
+  // Bütün mesajları yüklə bu thread üçün
+  const { data: msgs } = await db
+    .from('messages')
+    .select('*')
+    .or(`and(sender_id.eq.${senderId},receiver_id.eq.${currentUser.id}),and(sender_id.eq.${currentUser.id},receiver_id.eq.${senderId})`)
+    .eq('product_id', productId)
+    .order('created_at', { ascending: true });
+
+  // Oxundu işarələ
+  await db.from('messages').update({ is_read: true })
+    .eq('sender_id', senderId).eq('receiver_id', currentUser.id).eq('product_id', productId);
+
+  const { data: product } = await db.from('products').select('id,title').eq('id', productId).single();
+
+  container.innerHTML = `
+    <button class="chat-back" onclick="loadMessages('${currentUser.id}')">← Geriyə</button>
+    <div class="chat-header">
+      <div style="font-size:22px;">💬</div>
+      <div>
+        <div style="font-size:15px;font-weight:400;color:var(--navy);">${senderName}</div>
+        <div style="font-size:12px;color:var(--olive);">📦 ${product?.title || 'Məhsul'}</div>
+      </div>
+      <a href="product.html?id=${productId}" style="margin-left:auto;font-size:13px;color:var(--olive);text-decoration:none;">Məhsula bax →</a>
+    </div>
+    <div class="chat-messages" id="chatMsgs">
+      ${(msgs || []).map(m => `
+        <div>
+          <div class="chat-bubble ${m.sender_id === currentUser.id ? 'sent' : 'received'}">
+            ${(() => {
+              try {
+                const p = JSON.parse(m.content);
+                if (p.type === 'offer') {
+                  const isOwn = m.sender_id === currentUser.id;
+                  let statusHtml = '';
+                  if (p.status === 'accepted') statusHtml = '<div><span class="offer-status offer-accepted">✅ Qəbul edildi</span></div>';
+                  else if (p.status === 'rejected') statusHtml = '<div><span class="offer-status offer-rejected">❌ Rədd edildi</span></div>';
+                  else if (!isOwn) statusHtml = `<div class="offer-actions"><button class="offer-accept" onclick="respondToOffer('${m.id}',true,'${m.sender_id}','${productId}','${senderName}')">✅ Qəbul et</button><button class="offer-reject" onclick="respondToOffer('${m.id}',false,'${m.sender_id}','${productId}','${senderName}')">❌ Rədd et</button></div>`;
+                  else statusHtml = '<div style="font-size:12px;color:var(--muted);margin-top:4px;">Cavab gözlənilir...</div>';
+                  return `<div class="offer-bubble ${isOwn?'sent':''}"><div class="offer-label">💰 Qiymət təklifi</div><div class="offer-amount">₼${p.amount}</div>${statusHtml}</div>`;
+                }
+              } catch(e) {}
+              if (p.type === 'image' && p.url) {
+                return '<img src="' + p.url + '" alt="Şəkil" onclick="window.open(this.src,\'_blank\')" style="cursor:zoom-in;max-width:200px;max-height:200px;border-radius:10px;display:block;margin-bottom:4px;">';
+              }
+              return m.content;
+            })()}
+            <div class="chat-bubble-time">${new Date(m.created_at).toLocaleTimeString('az-AZ', {hour:'2-digit',minute:'2-digit'})}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-bottom:8px;">
+      <button onclick="showOfferInput('${senderId}','${productId}','${senderName}')" style="font-family:inherit;font-size:13px;color:var(--olive);background:none;border:1.5px solid var(--olive);border-radius:8px;padding:7px 14px;cursor:pointer;">💰 Qiymət təklif et</button>
+    </div>
+    <div class="offer-input-wrap" id="offerInputWrap">
+      <label>Nə qədər təklif edirsiz? (₼)</label>
+      <input class="offer-price-input" type="number" id="offerPrice" placeholder="0">
+      <button class="offer-send-btn" onclick="sendOfferMsg('${senderId}','${productId}','${senderName}')">Təklifi göndər</button>
+    </div>
+    <div class="chat-img-preview" id="chatImgPreview">
+      <img id="chatImgPreviewImg" src="">
+      <button class="chat-img-preview-remove" onclick="removeChatImg()">✕ Şəkli sil</button>
+    </div>
+    <input type="file" id="chatImgInput" accept="image/*" onchange="previewChatImg(this,'${senderId}','${productId}','${senderName}')">
+    <div class="chat-input-row">
+      <div class="chat-img-btn" onclick="document.getElementById('chatImgInput').click()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <input class="chat-input" id="chatReply" placeholder="Cavab yaz..." onkeydown="if(event.key==='Enter')sendReply('${senderId}','${productId}','${senderName}')">
+      <button class="chat-send" onclick="sendReply('${senderId}','${productId}','${senderName}')">Göndər</button>
+    </div>
+  `;
+
+  // Aşağıya scroll et
+  setTimeout(() => {
+    const msgs = document.getElementById('chatMsgs');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  }, 100);
+}
+
+async function uploadAvatar(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('avatarStatus');
+  status.textContent = 'Yüklənir...';
+  const ext = file.name.split('.').pop();
+  const path = `${currentUser.id}/avatar.${ext}`;
+  await db.storage.from('avatars').remove([path]);
+  const { error } = await db.storage.from('avatars').upload(path, file, { upsert: true });
+  if (error) { status.textContent = 'Xəta baş verdi.'; return; }
+  const { data } = db.storage.from('avatars').getPublicUrl(path);
+  await db.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', currentUser.id);
+  document.getElementById('editAvatar').innerHTML = `<img src="${data.publicUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+  status.textContent = '✓ Şəkil yeniləndi!';
+  status.style.color = 'var(--olive)';
+  const h = document.querySelector('#profileHeader .avatar');
+  if (h) h.innerHTML = `<img src="${data.publicUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+}
+
+function showOfferInput() {
+  const wrap = document.getElementById('offerInputWrap');
+  if (wrap) { wrap.classList.toggle('show'); if(wrap.classList.contains('show')) document.getElementById('offerPrice').focus(); }
+}
+
+async function sendOfferMsg(receiverId, productId, receiverName) {
+  const price = parseFloat(document.getElementById('offerPrice').value);
+  if (!price || price <= 0) { alert('Qiymət daxil edin'); return; }
+  const offerContent = JSON.stringify({ type: 'offer', amount: price, status: 'pending' });
+  await db.from('messages').insert({ product_id: productId, sender_id: currentUser.id, receiver_id: receiverId, content: offerContent });
+  document.getElementById('offerPrice').value = '';
+  document.getElementById('offerInputWrap').classList.remove('show');
+  openChat(receiverId, productId, receiverName);
+}
+
+async function respondToOffer(msgId, accept, senderId, productId, senderName) {
+  const { data: msg } = await db.from('messages').select('content').eq('id', msgId).single();
+  const offer = JSON.parse(msg.content);
+  offer.status = accept ? 'accepted' : 'rejected';
+  await db.from('messages').update({ content: JSON.stringify(offer) }).eq('id', msgId);
+  await db.from('messages').insert({ product_id: productId, sender_id: currentUser.id, receiver_id: senderId, content: accept ? '✅ Təklifi qəbul etdim!' : '❌ Təklifi rədd etdim.' });
+  openChat(senderId, productId, senderName);
+}
+
+
+let pendingChatImg = null;
+
+function previewChatImg(input) {
+  const file = input.files[0];
+  if (!file) return;
+  pendingChatImg = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('chatImgPreviewImg').src = e.target.result;
+    document.getElementById('chatImgPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeChatImg() {
+  pendingChatImg = null;
+  document.getElementById('chatImgPreview').style.display = 'none';
+  document.getElementById('chatImgPreviewImg').src = '';
+  document.getElementById('chatImgInput').value = '';
+}
+
+async function uploadChatImage(file) {
+  const ext = file.name.split('.').pop();
+  const path = `chat/${currentUser.id}/${Date.now()}.${ext}`;
+  const { error } = await db.storage.from('product-images').upload(path, file, { upsert: true });
+  if (error) return null;
+  const { data } = db.storage.from('product-images').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function sendReply(receiverId, productId, receiverName) {
+  const input = document.getElementById('chatReply');
+  const text = input.value.trim();
+  
+  if (!text && !pendingChatImg) return;
+
+  input.value = '';
+
+  // Şəkil varsa yüklə
+  if (pendingChatImg) {
+    const imgUrl = await uploadChatImage(pendingChatImg);
+    if (imgUrl) {
+      const imgContent = JSON.stringify({ type: 'image', url: imgUrl });
+      await db.from('messages').insert({
+        product_id: productId,
+        sender_id: currentUser.id,
+        receiver_id: receiverId,
+        content: imgContent
+      });
+    }
+    removeChatImg();
+  }
+
+  // Mətn varsa göndər
+  if (text) {
+    await db.from('messages').insert({
+      product_id: productId,
+      sender_id: currentUser.id,
+      receiver_id: receiverId,
+      content: text
+    });
+  }
+
+  openChat(receiverId, productId, receiverName);
+}
+
+async function doLogout() {
+  await db.auth.signOut();
+  location.href = 'index.html';
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+updateNavAuth();
+loadProfile();
+
+async function toggleFollow(sellerId) {
+  if (!currentUser) { location.href = 'login.html'; return; }
+  const btn = document.getElementById('followBtn');
+  const { data: existing } = await db.from('follows')
+    .select('id').eq('follower_id', currentUser.id).eq('following_id', sellerId).maybeSingle();
+  if (existing) {
+    await db.from('follows').delete().eq('id', existing.id);
+    btn.textContent = 'İzlə';
+    btn.style.cssText = '';
+  } else {
+    await db.from('follows').insert({ follower_id: currentUser.id, following_id: sellerId });
+    btn.textContent = '✓ İzlənir';
+    btn.style.cssText = 'background:var(--cream2);color:var(--navy);border:1.5px solid var(--border);';
+  }
+}
+
+function openDirectMsg(sellerId, sellerName) {
+  if (!currentUser) { location.href = 'login.html'; return; }
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:var(--white);border-radius:16px;padding:28px;width:100%;max-width:480px;">
+      <h3 style="font-size:26px;color:var(--navy);margin-bottom:6px;">${sellerName}</h3>
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;">Birbaşa mesaj göndər</p>
+      <textarea id="directMsgText" style="width:100%;font-family:inherit;font-size:14px;color:var(--navy);background:var(--cream2);border:1.5px solid var(--border);border-radius:10px;padding:14px;outline:none;resize:vertical;min-height:100px;box-sizing:border-box;" placeholder="Mesajınızı yazın..."></textarea>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="font-family:inherit;font-size:14px;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:10px;padding:12px 20px;cursor:pointer;">Ləğv et</button>
+        <button onclick="sendDirectMsg('${sellerId}')" style="flex:1;font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:10px;padding:12px;cursor:pointer;">Göndər →</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+async function sendDirectMsg(sellerId) {
+  const text = document.getElementById('directMsgText')?.value.trim();
+  if (!text) return;
+  const { data: products } = await db.from('products')
+    .select('id').eq('seller_id', sellerId).eq('is_active', true).limit(1);
+  const productId = products?.[0]?.id || null;
+  const { error } = await db.from('messages').insert({
+    product_id: productId,
+    sender_id: currentUser.id,
+    receiver_id: sellerId,
+    content: text
+  });
+  if (error) { alert('Xəta: ' + error.message); return; }
+  document.querySelector('div[style*="position:fixed"][style*="inset"]')?.remove();
+  alert('✓ Mesaj göndərildi!');
+}
+
+async function loadReviews(sellerId) {
+  const container = document.getElementById('reviewsContainer');
+  if (!container) return;
+  const { data: reviews } = await db.from('reviews')
+    .select('*, reviewer:profiles!reviews_reviewer_id_fkey(id,full_name,avatar_url)')
+    .eq('seller_id', sellerId).order('created_at', { ascending: false });
+  const list = reviews || [];
+  const count = list.length;
+  const avg = count > 0 ? (list.reduce((s,r) => s+r.rating, 0) / count).toFixed(1) : 0;
+  if (count > 0) {
+    const badge = document.getElementById('reviewsBadge');
+    if (badge) badge.innerHTML = `<span style="background:var(--olive);color:white;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px;">${count}</span>`;
+  }
+  const bars = [5,4,3,2,1].map(s => ({ s, c: list.filter(r => r.rating === s).length }));
+  let formHtml = '';
+  if (currentUser && !isOwnProfile) {
+    const alreadyReviewed = list.some(r => r.reviewer_id === currentUser.id);
+    if (!alreadyReviewed) {
+      formHtml = `<div style="background:var(--cream2);border:1.5px solid var(--olive);border-radius:14px;padding:20px;margin-bottom:20px;">
+        <h4 style="font-size:20px;color:var(--navy);margin-bottom:14px;">Rəy yaz</h4>
+        <div style="display:flex;gap:6px;margin-bottom:12px;" id="starSelect">
+          ${[1,2,3,4,5].map(s => `<button style="font-size:24px;cursor:pointer;opacity:0.4;background:none;border:none;padding:0;" data-val="${s}" onclick="selectStar(${s})">★</button>`).join('')}
+        </div>
+        <textarea id="reviewText" style="width:100%;font-family:inherit;font-size:14px;color:var(--navy);background:var(--white);border:1.5px solid var(--border);border-radius:9px;padding:10px 14px;outline:none;resize:vertical;min-height:80px;box-sizing:border-box;" placeholder="Bu satıcı haqqında rəyinizi yazın..."></textarea>
+        <button onclick="submitReview('${sellerId}')" style="font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:9px;padding:11px 24px;cursor:pointer;margin-top:10px;">Göndər</button>
+      </div>`;
+    }
+  }
+  container.innerHTML = `
+    ${count > 0 ? `<div style="display:flex;align-items:center;gap:24px;background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;">
+      <div style="text-align:center;flex-shrink:0;">
+        <div style="font-family:'Amatic SC',cursive;font-size:56px;font-weight:700;color:var(--navy);line-height:1;">${avg}</div>
+        <div style="font-size:20px;margin:4px 0;">${'★'.repeat(Math.round(avg))}${'☆'.repeat(5-Math.round(avg))}</div>
+        <div style="font-size:13px;color:var(--muted);">${count} rəy</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+        ${bars.map(b => `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
+          <span>${b.s}★</span>
+          <div style="flex:1;height:6px;background:var(--cream2);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;background:var(--olive);border-radius:3px;width:${count>0?Math.round(b.c/count*100):0}%"></div>
+          </div>
+          <span style="min-width:20px;">${b.c}</span>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+    ${formHtml}
+    ${list.length === 0 ? '<div class="empty-state"><h3>Hələ rəy yoxdur</h3></div>' : ''}
+    ${list.map(r => `<div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--cream2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0;">
+          ${r.reviewer?.avatar_url ? `<img src="${r.reviewer.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : '👤'}
+        </div>
+        <div>
+          <div style="font-size:14px;color:var(--navy);font-weight:400;">${r.reviewer?.full_name || 'İstifadəçi'}</div>
+          <div style="font-size:12px;color:var(--muted);">${new Date(r.created_at).toLocaleDateString('en-GB')}</div>
+        </div>
+        <div style="margin-left:auto;font-size:14px;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      </div>
+      ${r.comment ? `<div style="font-size:14px;color:var(--muted);line-height:1.6;">${r.comment}</div>` : ''}
+    </div>`).join('')}`;
+}
+
+let selectedRating = 0;
+function selectStar(val) {
+  selectedRating = val;
+  document.querySelectorAll('#starSelect button').forEach(b => {
+    b.style.opacity = parseInt(b.dataset.val) <= val ? '1' : '0.4';
+  });
+}
+
+async function submitReview(sellerId) {
+  if (!selectedRating) { alert('Ulduz seçin'); return; }
+  const comment = document.getElementById('reviewText').value.trim();
+  const { error } = await db.from('reviews').insert({
+    reviewer_id: currentUser.id, seller_id: sellerId,
+    rating: selectedRating, comment: comment || null
+  });
+  if (error) { alert('Xəta: ' + error.message); return; }
+  loadReviews(sellerId);
+}
+</script>
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<style>
+    @media (max-width: 768px) {
+      .profile-header { padding: 20px 12px 18px; }
+      .profile-header-inner { gap: 14px; flex-wrap: nowrap; }
+      .avatar { width: 68px; height: 68px; font-size: 28px; flex-shrink: 0; }
+      .profile-name { font-size: 26px; }
+      .profile-meta { gap: 6px; font-size: 12px; }
+      .profile-stats { gap: 16px; }
+      .stat-num { font-size: 22px; }
+      .profile-actions { flex-direction: row; margin-left: auto; align-items: center; flex-wrap: wrap; gap: 6px; }
+      .btn-follow, .btn-msg, .btn-logout { padding: 8px 14px; font-size: 12.5px; }
+      .profile-tabs { padding: 0 8px; }
+      .tab { padding: 11px 12px; font-size: 12.5px; }
+      .profile-content { padding: 20px 12px 80px; }
+      .edit-card { padding: 18px 14px; }
+    }
+</style>
+</body>
+</html>

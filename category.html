@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Kateqoriya — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .page-wrap { max-width:1160px; margin:0 auto; padding:32px 2rem 64px; display:grid; grid-template-columns:240px 1fr; gap:32px; align-items:start; }
+    .sidebar { display:flex; flex-direction:column; gap:24px; position:sticky; top:84px; }
+    .filter-group h3 { font-size:18px; color:var(--navy); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+    .filter-options { display:flex; flex-direction:column; gap:9px; }
+    .filter-option { display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .filter-option input[type="checkbox"] { accent-color:var(--olive); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+    .filter-option label { font-size:13.5px; color:var(--navy); cursor:pointer; flex:1; }
+    .filter-option .count { font-size:11px; color:var(--muted); }
+    .price-range {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    flex-direction: column;
+}
+    .price-input { flex:1; border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; font-family:inherit; font-size:13.5px; font-weight:300; color:var(--navy); background:var(--cream2); outline:none; }
+    .price-input:focus { border-color:var(--olive); background:var(--white); }
+    .size-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+    .size-btn { padding:7px 4px; border:1.5px solid var(--border); border-radius:7px; font-family:inherit; font-size:12.5px; color:var(--navy); background:none; cursor:pointer; text-align:center; transition:all 0.15s; }
+    .size-btn:hover,.size-btn.active { border-color:var(--olive); background:var(--olive); color:white; }
+    .apply-btn { width:100%; font-family:inherit; font-size:14px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:9px; padding:12px; cursor:pointer; transition:background 0.18s; }
+    .apply-btn:hover { background:var(--olive-dark); }
+    .clear-btn { width:100%; font-family:inherit; font-size:13.5px; font-weight:300; color:var(--muted); background:none; border:none; cursor:pointer; padding:8px; transition:color 0.15s; }
+    .clear-btn:hover { color:var(--navy); }
+    .results-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+    .results-title { font-size:28px; color:var(--navy); }
+    .results-count { font-size:13.5px; color:var(--muted); margin-left:8px; font-weight:300; }
+    .sort-select { font-family:inherit; font-size:13.5px; font-weight:300; color:var(--navy); background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; cursor:pointer; outline:none; }
+    .sort-select:focus { border-color:var(--olive); }
+    .pagination { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:40px; }
+    .page-btn { width:36px; height:36px; border:1.5px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:inherit; font-size:13.5px; color:var(--navy); background:none; cursor:pointer; transition:all 0.15s; }
+    .page-btn:hover { border-color:var(--olive); color:var(--olive); }
+    .page-btn.active { background:var(--olive); border-color:var(--olive); color:white; }
+    .empty-state { text-align:center; padding:64px 2rem; color:var(--muted); grid-column:1/-1; }
+    .empty-state h3 { font-size:28px; color:var(--navy); margin-bottom:8px; }
+    .skeleton { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:14px; height:300px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+    <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+      Kataloq
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+    </button>
+    <div class="catalog-dropdown">
+      <div class="dropdown-sub">
+        <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+          🛍️ Məhsullar
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="dropdown-sub-menu">
+          <a href="category.html">Hamısı</a>
+          <a href="category.html?cat=Qadın">👗 Qadın</a>
+          <a href="category.html?cat=Kişi">👔 Kişi</a>
+          <a href="category.html?cat=Dizayner">Brendlər</a>
+          <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+          <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+          <a href="category.html?cat=İdman">🏃 İdman</a>
+          <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+          <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+          <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+          <a href="category.html?cat=Baxım">💄 Baxım</a>
+          <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+              <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+          <a href="category.html?cat=Digər">📦 Digər</a>
+        </div>
+      </div>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-section-label">✨ Xüsusi</div>
+      <a href="auction.html">🔨 Auksiyon</a>
+      <a href="swipe.html">💫 Kəşf et</a>
+      <a href="feed.html">📱 Feed</a>
+      <a href="blog.html">📝 Blog</a>
+    </div>
+  </div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Məhsul, brend, kateqoriya axtar..." onkeydown="if(event.key==='Enter')applyFilters()">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<div class="cat-nav" id="catNav">
+  <a class="cat-item active" href="category.html">Hamısı</a>
+  <a class="cat-item" href="category.html?cat=Qadın">Qadın</a>
+  <a class="cat-item" href="category.html?cat=Kişi">Kişi</a>
+  <a class="cat-item" href="category.html?cat=Uşaq">Uşaq</a>
+  <a class="cat-item" href="category.html?cat=Dizayner">Brendlər</a>
+  <a class="cat-item" href="category.html?cat=Ayaqqabı">Ayaqqabı</a>
+  <a class="cat-item" href="category.html?cat=İdman">İdman</a>
+  <a class="cat-item" href="category.html?cat=Aksessuar">Aksessuar</a>
+  <a class="cat-item" href="category.html?cat=Xüsusi gün geyimi">Xüsusi gün geyimi</a>
+  <a class="cat-item" href="category.html?cat=Çantalar">Çantalar</a>
+  <a class="cat-item" href="category.html?cat=Baxım">Baxım</a>
+<a class="cat-item" href="category.html?cat=Ev əşyaları">Ev əşyaları</a>
+<a class="cat-item" href="category.html?cat=Parfüm">Parfüm</a>
+<a class="cat-item" href="category.html?cat=Digər">Digər</a>
+  
+</div>
+
+<div class="page-wrap">
+  <aside class="sidebar">
+    <div class="filter-group">
+      <h3>Kateqoriya</h3>
+      <div class="filter-options" id="categoryOptions">
+        <div style="color:var(--muted);font-size:13px;">Yüklənir...</div>
+      </div>
+    </div>
+    <div class="filter-group">
+      <h3>Qiymət (₼)</h3>
+      <div class="price-range">
+        <input class="price-input" type="number" id="priceMin" placeholder="Min">
+        <span style="color:var(--muted);">—</span>
+        <input class="price-input" type="number" id="priceMax" placeholder="Max">
+      </div>
+    </div>
+    <div class="filter-group">
+      <h3>Ölçü</h3>
+      <div class="size-grid">
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">XS</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">S</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">M</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">L</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">XL</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">XXL</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">36</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">38</button>
+        <button class="size-btn" onclick="this.classList.toggle('active');applyFilters()">40</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <h3>Vəziyyət</h3>
+      <div class="filter-options">
+        <div class="filter-option"><input type="checkbox" id="c1" value="new_with_tags" onchange="applyFilters()"><label for="c1">Yeni, etiketle</label></div>
+        <div class="filter-option"><input type="checkbox" id="c2" value="excellent" onchange="applyFilters()"><label for="c2">Əla vəziyyət</label></div>
+        <div class="filter-option"><input type="checkbox" id="c3" value="good" onchange="applyFilters()"><label for="c3">Yaxşı vəziyyət</label></div>
+        <div class="filter-option"><input type="checkbox" id="c4" value="fair" onchange="applyFilters()"><label for="c4">Kafi vəziyyət</label></div>
+      </div>
+    </div>
+    <button class="apply-btn" onclick="applyFilters()">Filtri tətbiq et</button>
+    <button class="clear-btn" onclick="clearFilters()">Hamısını sıfırla</button>
+  </aside>
+
+  <div>
+    <div class="results-header">
+  <div>
+    <h2 class="results-title" id="resultsTitle" style="display:inline;">Bütün məhsullar</h2>
+    <span class="results-count" id="resultsCount"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button class="filter-toggle-btn" onclick="openFilterSheet()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg> Filter</button>
+    <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+      <option value="created_at_desc">Ən yeni əvvəl</option>
+      <option value="price_asc">Qiymət: aşağıdan yuxarı</option>
+      <option value="price_desc">Qiymət: yuxarıdan aşağı</option>
+    </select>
+  </div>
+</div>
+
+    <div class="grid" id="productsGrid">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+
+<!-- MOBİL FILTER SHEET -->
+<div class="filter-sheet-overlay" id="filterOverlay" onclick="closeFilterSheet()"></div>
+<div class="filter-sheet" id="filterSheet">
+  <div class="filter-sheet-handle"></div>
+  <div class="filter-sheet-head">
+    <h3>Filter</h3>
+    <button class="filter-sheet-close" onclick="closeFilterSheet()">×</button>
+  </div>
+  <div class="filter-sheet-body">
+
+    <!-- KATEQORİYA -->
+    <div class="filter-sheet-section">
+      <div class="filter-sheet-row" onclick="toggleSheetSection(this)">
+        <span class="filter-sheet-row-label">KATEQORİYA</span>
+        <span class="filter-sheet-row-arrow">↓</span>
+      </div>
+      <div class="filter-sheet-inner" id="sheet-cat">
+        <div class="filter-chips" id="sheetCatChips"></div>
+      </div>
+    </div>
+
+    <!-- ÖLÇÜ -->
+    <div class="filter-sheet-section">
+      <div class="filter-sheet-row" onclick="toggleSheetSection(this)">
+        <span class="filter-sheet-row-label">ÖLÇÜ</span>
+        <span class="filter-sheet-row-arrow">↓</span>
+      </div>
+      <div class="filter-sheet-inner" id="sheet-size">
+        <div class="filter-chips">
+          <button class="filter-chip" onclick="this.classList.toggle('active')">XS</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">S</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">M</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">L</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">XL</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">XXL</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">36</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">38</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">40</button>
+          <button class="filter-chip" onclick="this.classList.toggle('active')">42</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VƏZİYYƏT -->
+    <div class="filter-sheet-section">
+      <div class="filter-sheet-row" onclick="toggleSheetSection(this)">
+        <span class="filter-sheet-row-label">VƏZİYYƏT</span>
+        <span class="filter-sheet-row-arrow">↓</span>
+      </div>
+      <div class="filter-sheet-inner" id="sheet-cond">
+        <div class="filter-chips">
+          <button class="filter-chip" data-val="new_with_tags" onclick="this.classList.toggle('active')">✨ Yeni, etiketle</button>
+          <button class="filter-chip" data-val="excellent" onclick="this.classList.toggle('active')">⭐ Əla</button>
+          <button class="filter-chip" data-val="good" onclick="this.classList.toggle('active')">👍 Yaxşı</button>
+          <button class="filter-chip" data-val="fair" onclick="this.classList.toggle('active')">✔️ Kafi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QİYMƏT -->
+    <div class="filter-sheet-section">
+      <div class="filter-sheet-row" onclick="toggleSheetSection(this)">
+        <span class="filter-sheet-row-label">QİYMƏT (₼)</span>
+        <span class="filter-sheet-row-arrow">↓</span>
+      </div>
+      <div class="filter-sheet-inner" id="sheet-price">
+        <div class="price-row">
+          <input class="price-input" type="number" id="sheetPriceMin" placeholder="Min" style="flex:1;">
+          <span style="color:var(--muted);">—</span>
+          <input class="price-input" type="number" id="sheetPriceMax" placeholder="Max" style="flex:1;">
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="filter-sheet-footer">
+    <button class="filter-sheet-clear" onclick="clearSheetFilters()">Sıfırla</button>
+    <button class="filter-sheet-apply" onclick="applySheetFilters()">Tətbiq et</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const catParam = params.get('cat');
+const searchParam = params.get('q');
+
+// Set active cat-item
+if (catParam) {
+  document.querySelectorAll('.cat-item').forEach(el => {
+    el.classList.remove('active');
+    if (el.textContent.trim() === catParam) el.classList.add('active');
+  });
+  document.getElementById('resultsTitle').textContent = catParam;
+  document.title = catParam + ' — Dolab.az';
+} else if (searchParam) {
+  document.getElementById('searchInput').value = searchParam;
+  document.getElementById('resultsTitle').textContent = '"' + searchParam + '"';
+  document.title = searchParam + ' — Dolab.az';
+} else {
+  document.querySelector('.cat-item').classList.add('active');
+}
+
+async function applyFilters() {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = '<div class="skeleton"></div>'.repeat(6);
+
+  let query = db.from('products_with_seller').select('*', { count: 'exact' });
+
+  // Category filter - sidebar checkbox-dan da al
+  const checkedCats = [...document.querySelectorAll('#categoryOptions input:checked')].map(c => c.value);
+  const activeCat = checkedCats.length > 0 ? checkedCats[0] : catParam;
+  if (activeCat) {
+    const { data: catData } = await db.from('categories').select('id').eq('name', activeCat).single();
+    if (catData) query = query.eq('category_id', catData.id);
+  }
+
+  // Search
+  const q = document.getElementById('searchInput').value.trim() || searchParam;
+  if (q) query = query.ilike('title', '%' + q + '%');
+
+  // Price
+  const minP = parseFloat(document.getElementById('priceMin').value);
+  const maxP = parseFloat(document.getElementById('priceMax').value);
+  if (minP) query = query.gte('price', minP);
+  if (maxP) query = query.lte('price', maxP);
+
+  // Size
+  const activeSizes = [...document.querySelectorAll('.size-btn.active')].map(b => b.textContent);
+  if (activeSizes.length > 0) query = query.in('size', activeSizes);
+
+  // Condition
+  const checkedConds = [...document.querySelectorAll('.filter-options input:checked')].map(c => c.value);
+  if (checkedConds.length > 0) query = query.in('condition', checkedConds);
+
+  // Sort
+  const sort = document.getElementById('sortSelect').value;
+  if (sort === 'price_asc') query = query.order('price', { ascending: true });
+  else if (sort === 'price_desc') query = query.order('price', { ascending: false });
+  else query = query.order('created_at', { ascending: false });
+
+  const { data: products, count } = await query;
+
+  document.getElementById('resultsCount').textContent = count ? count + ' məhsul' : '';
+
+  if (!products || products.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><h3>Məhsul tapılmadı</h3><p>Filtrləri dəyişdirin və ya axtarış sözünü düzəldin.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map(createProductCard).join('');
+}
+
+function clearFilters() {
+  document.getElementById('priceMin').value = '';
+  document.getElementById('priceMax').value = '';
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-options input').forEach(c => c.checked = false);
+  document.getElementById('searchInput').value = '';
+  applyFilters();
+}
+
+async function loadCategories() {
+  const { data: cats } = await db.from('categories').select('*').order('id');
+  if (!cats) return;
+  const container = document.getElementById('categoryOptions');
+  container.innerHTML = cats.map(c => `
+    <div class="filter-option">
+      <input type="checkbox" id="cat_${c.id}" value="${c.name}"
+        ${catParam === c.name ? 'checked' : ''}
+        onchange="applyFilters()">
+      <label for="cat_${c.id}">${c.icon || ''} ${c.name}</label>
+    </div>
+  `).join('');
+}
+
+// clearFilters-də kateqoriya checkbox-ları da sıfırla
+const _origClear = clearFilters;
+function clearFilters() {
+  document.getElementById('priceMin').value = '';
+  document.getElementById('priceMax').value = '';
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-options input').forEach(c => c.checked = false);
+  document.querySelectorAll('#categoryOptions input').forEach(c => c.checked = false);
+  document.getElementById('searchInput').value = '';
+  applyFilters();
+}
+
+function openFilterSheet() {
+  document.getElementById('filterSheet').classList.add('open');
+  document.getElementById('filterOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadSheetCategories();
+}
+
+function closeFilterSheet() {
+  document.getElementById('filterSheet').classList.remove('open');
+  document.getElementById('filterOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function toggleSheetSection(row) {
+  row.classList.toggle('expanded');
+  row.nextElementSibling.classList.toggle('open');
+}
+
+async function loadSheetCategories() {
+  const container = document.getElementById('sheetCatChips');
+  if (container.children.length > 0) return;
+  const { data: cats } = await db.from('categories').select('*').order('id');
+  if (!cats) return;
+  container.innerHTML = cats.map(c => `
+    <button class="filter-chip ${catParam === c.name ? 'active' : ''}"
+      data-val="${c.name}" onclick="this.classList.toggle('active')">${c.icon || ''} ${c.name}</button>
+  `).join('');
+}
+
+function applySheetFilters() {
+  const activeCats = [...document.querySelectorAll('#sheetCatChips .filter-chip.active')].map(b => b.dataset.val);
+  const activeSizes = [...document.querySelectorAll('#sheet-size .filter-chip.active')].map(b => b.textContent.trim());
+  const activeConds = [...document.querySelectorAll('#sheet-cond .filter-chip.active')].map(b => b.dataset.val);
+  const minP = document.getElementById('sheetPriceMin').value;
+  const maxP = document.getElementById('sheetPriceMax').value;
+
+  document.querySelectorAll('#categoryOptions input').forEach(inp => {
+    inp.checked = activeCats.includes(inp.value);
+  });
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.toggle('active', activeSizes.includes(btn.textContent.trim()));
+  });
+  document.querySelectorAll('.filter-options input[type=checkbox]').forEach(inp => {
+    inp.checked = activeConds.includes(inp.value);
+  });
+  if (minP) document.getElementById('priceMin').value = minP;
+  if (maxP) document.getElementById('priceMax').value = maxP;
+
+  closeFilterSheet();
+  applyFilters();
+}
+
+function clearSheetFilters() {
+  document.querySelectorAll('#filterSheet .filter-chip').forEach(b => b.classList.remove('active'));
+  document.getElementById('sheetPriceMin').value = '';
+  document.getElementById('sheetPriceMax').value = '';
+  clearFilters();
+  closeFilterSheet();
+}
+
+updateNavAuth();
+loadCategories().then(() => applyFilters());
+</script>
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<style>
+  
+    @media (max-width: 768px) {
+      .page-wrap { grid-template-columns: 1fr; padding: 12px 12px 80px; gap: 0; }
+      .sidebar { position: static; display: none; }
+      .sidebar.open { display: flex; flex-direction: column; gap: 16px; background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+      .filter-toggle-btn { display: flex; align-items: center; gap: 8px; font-family: inherit; font-size: 13px; color: var(--navy); background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 14px; cursor: pointer; }
+      
+      .results-header { flex-direction: row; align-items: center; }
+      .results-title { font-size: 22px; }
+    }
+    @media (min-width: 769px) { .filter-toggle-btn { display: none; } }
+
+    /* ── MOBİL FILTER SHEET ── */
+    .filter-sheet-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:800; }
+    .filter-sheet-overlay.open { display:block; }
+    .filter-sheet { position:fixed; bottom:0; left:0; right:0; background:var(--white); border-radius:20px 20px 0 0; z-index:900; max-height:90vh; overflow-y:auto; padding-bottom:calc(16px + env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform 0.3s ease; }
+    .filter-sheet.open { transform:translateY(0); }
+    .filter-sheet-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:12px auto 0; }
+    .filter-sheet-head { display:flex; align-items:center; justify-content:space-between; padding:16px 20px 12px; border-bottom:1px solid var(--border); }
+    .filter-sheet-head h3 { font-size:18px; color:var(--navy); }
+    .filter-sheet-close { background:none; border:none; font-size:20px; color:var(--muted); cursor:pointer; padding:4px; }
+    .filter-sheet-body { padding:0 20px; }
+    .filter-sheet-section { border-bottom:1px solid var(--border); }
+    .filter-sheet-row { display:flex; align-items:center; justify-content:space-between; padding:16px 0; cursor:pointer; }
+    .filter-sheet-row-label { font-size:14px; font-weight:400; color:var(--navy); letter-spacing:0.03em; }
+    .filter-sheet-row-arrow { color:var(--muted); font-size:16px; transition:transform 0.2s; }
+    .filter-sheet-row.expanded .filter-sheet-row-arrow { transform:rotate(180deg); }
+    .filter-sheet-inner { display:none; padding-bottom:16px; }
+    .filter-sheet-inner.open { display:block; }
+    .filter-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+    .filter-chip { padding:7px 14px; border:1.5px solid var(--border); border-radius:20px; font-family:inherit; font-size:13px; color:var(--navy); background:none; cursor:pointer; transition:all 0.15s; }
+    .filter-chip.active { border-color:var(--navy); background:var(--navy); color:white; }
+    .filter-chip:hover:not(.active) { border-color:var(--navy); }
+    .filter-sheet-footer { display:flex; gap:10px; padding:16px 20px; border-top:1px solid var(--border); background:var(--white); position:sticky; bottom:0; }
+    .filter-sheet-clear { flex:1; font-family:inherit; font-size:14px; color:var(--navy); background:var(--white); border:1.5px solid var(--border); border-radius:10px; padding:13px; cursor:pointer; }
+    .filter-sheet-apply { flex:2; font-family:inherit; font-size:14px; font-weight:400; color:white; background:var(--navy); border:none; border-radius:10px; padding:13px; cursor:pointer; }
+    .price-row { display:flex; align-items:center; gap:10px; margin-top:4px; }
+    .filter-toggle-btn { display:none; }
+    @media (max-width: 768px) {
+      .filter-toggle-btn { display:flex; align-items:center; gap:8px; font-family:inherit; font-size:13px; color:var(--navy); background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:8px 14px; cursor:pointer; }
+    }
+
+</style>
+
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+
+</body>
+</html>

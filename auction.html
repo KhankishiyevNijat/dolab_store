@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Auksiyon — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    /* ── HERO ── */
+    .auction-hero { background:linear-gradient(135deg,var(--navy) 0%,#2d3555 100%); padding:48px 2.5rem 40px; text-align:center; }
+    .auction-hero h1 { font-size:52px; color:var(--white); margin-bottom:8px; }
+    .auction-hero p { font-size:15px; color:rgba(255,255,255,0.65); max-width:500px; margin:0 auto 24px; }
+    .auction-hero-stats { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; }
+    .hero-stat { text-align:center; }
+    .hero-stat-num { font-family:'Amatic SC',cursive; font-size:32px; font-weight:700; color:var(--nude); }
+    .hero-stat-label { font-size:12px; color:rgba(255,255,255,0.5); margin-top:2px; }
+
+    /* ── TABS ── */
+    .auction-tabs { background:var(--white); border-bottom:1px solid var(--border); padding:0 2.5rem; display:flex; gap:0; overflow-x:auto; }
+    .auction-tab { font-family:inherit; font-size:14px; font-weight:300; color:var(--muted); padding:14px 24px; cursor:pointer; border-bottom:2px solid transparent; background:none; border-left:none; border-right:none; border-top:none; white-space:nowrap; transition:all 0.18s; }
+    .auction-tab:hover { color:var(--navy); }
+    .auction-tab.active { color:var(--navy); font-weight:400; border-bottom-color:var(--olive); }
+
+    /* ── GRID ── */
+    .auction-wrap { max-width:1160px; margin:0 auto; padding:36px 2rem 80px; }
+    .auction-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+
+    /* ── AUCTION CARD ── */
+    .acard { background:var(--white); border:1px solid var(--border); border-radius:16px; overflow:hidden; transition:transform 0.2s,box-shadow 0.2s; cursor:pointer; }
+    .acard:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(0,0,0,0.10); }
+    .acard-img { width:100%; height:220px; object-fit:cover; object-position:top; background:var(--cream2); display:flex; align-items:center; justify-content:center; font-size:52px; position:relative; overflow:hidden; }
+    .acard-img img { width:100%; height:100%; object-fit:cover; object-position:top; }
+    .acard-type { position:absolute; top:10px; left:10px; font-size:11px; font-weight:500; padding:4px 10px; border-radius:20px; letter-spacing:0.03em; }
+    .type-timed { background:var(--navy); color:white; }
+    .type-offer { background:var(--olive); color:white; }
+    .acard-timer { position:absolute; bottom:10px; left:10px; right:10px; background:rgba(26,31,54,0.85); border-radius:8px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; }
+    .acard-timer-label { font-size:10px; color:rgba(255,255,255,0.6); }
+    .acard-timer-val { font-family:'Amatic SC',cursive; font-size:20px; font-weight:700; color:var(--nude); }
+    .acard-timer-val.urgent { color:#ff6b6b; }
+    .acard-body { padding:16px 18px 18px; }
+    .acard-brand { font-size:11px; color:var(--olive); font-weight:500; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:4px; }
+    .acard-title { font-size:17px; color:var(--navy); margin-bottom:12px; line-height:1.3; }
+    .acard-prices { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px; }
+    .acard-current { display:flex; flex-direction:column; }
+    .acard-current-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+    .acard-current-price { font-family:'Amatic SC',cursive; font-size:28px; font-weight:700; color:var(--olive); }
+    .acard-start { display:flex; flex-direction:column; align-items:flex-end; }
+    .acard-start-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; }
+    .acard-start-price { font-size:14px; color:var(--muted); text-decoration:line-through; }
+    .acard-meta { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid var(--border); }
+    .acard-bids { font-size:12px; color:var(--muted); }
+    .acard-bids span { color:var(--navy); font-weight:400; }
+    .acard-seller { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+    .acard-seller-av { width:20px; height:20px; border-radius:50%; background:var(--cream2); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:10px; border:1px solid var(--border); }
+    .acard-seller-av img { width:100%; height:100%; object-fit:cover; }
+    .seller-approved { display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#2ecc71; background:#d4f5e2; padding:3px 8px; border-radius:20px; margin-top:6px; }
+
+    /* ── MODAL ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:var(--white); border-radius:20px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+    .modal-img { width:100%; height:240px; object-fit:cover; object-position:top; background:var(--cream2); display:flex; align-items:center; justify-content:center; font-size:64px; border-radius:20px 20px 0 0; overflow:hidden; }
+    .modal-img img { width:100%; height:100%; object-fit:cover; object-position:top; }
+    .modal-body { padding:24px 28px 28px; }
+    .modal-brand { font-size:11px; color:var(--olive); font-weight:500; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:4px; }
+    .modal-title { font-size:28px; color:var(--navy); margin-bottom:16px; line-height:1.2; }
+    .modal-timer-box { background:var(--navy); border-radius:12px; padding:16px 20px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; }
+    .modal-timer-label { font-size:12px; color:rgba(255,255,255,0.55); margin-bottom:4px; }
+    .modal-timer-val { font-family:'Amatic SC',cursive; font-size:36px; font-weight:700; color:var(--nude); }
+    .modal-timer-val.urgent { color:#ff6b6b; }
+    .modal-timer-ended { font-size:14px; color:rgba(255,255,255,0.6); }
+    .modal-price-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:20px; }
+    .modal-price-box { background:var(--cream2); border-radius:10px; padding:12px 14px; }
+    .modal-price-box-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+    .modal-price-box-val { font-family:'Amatic SC',cursive; font-size:22px; font-weight:700; color:var(--navy); }
+    .modal-price-box.highlight { background:var(--olive); }
+    .modal-price-box.highlight .modal-price-box-label { color:rgba(255,255,255,0.7); }
+    .modal-price-box.highlight .modal-price-box-val { color:white; }
+    .modal-bids-list { margin-bottom:20px; max-height:180px; overflow-y:auto; }
+    .modal-bid-item { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .modal-bid-item:last-child { border-bottom:none; }
+    .modal-bid-av { width:32px; height:32px; border-radius:50%; background:var(--cream2); border:1px solid var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .modal-bid-av img { width:100%; height:100%; object-fit:cover; }
+    .modal-bid-name { font-size:13.5px; color:var(--navy); flex:1; }
+    .modal-bid-time { font-size:11px; color:var(--muted); }
+    .modal-bid-amount { font-family:'Amatic SC',cursive; font-size:22px; font-weight:700; color:var(--olive); }
+    .modal-bid-amount.top { color:var(--olive); }
+    .seller-approve-btn { width:100%; font-family:inherit; font-size:14px; color:white; background:#2ecc71; border:none; border-radius:10px; padding:12px; cursor:pointer; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; transition:background 0.18s; }
+    .seller-approve-btn:hover { background:#27ae60; }
+    .seller-approved-badge { background:#d4f5e2; border:1px solid #2ecc71; border-radius:10px; padding:12px 16px; text-align:center; font-size:14px; color:#1a7a40; margin-bottom:12px; }
+    .bid-input-row { display:flex; gap:10px; }
+    .bid-input { flex:1; font-family:'Amatic SC',cursive; font-size:24px; font-weight:700; color:var(--olive); background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; outline:none; }
+    .bid-input:focus { border-color:var(--olive); background:var(--white); }
+    .bid-btn { font-family:inherit; font-size:15px; font-weight:400; color:white; background:var(--olive); border:none; border-radius:10px; padding:12px 24px; cursor:pointer; transition:background 0.18s; white-space:nowrap; }
+    .bid-btn:hover { background:var(--olive-dark); }
+    .bid-btn:disabled { opacity:0.6; cursor:not-allowed; }
+    .bid-hint { font-size:12px; color:var(--muted); margin-top:6px; }
+    .modal-close { position:absolute; top:16px; right:16px; width:36px; height:36px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
+    .modal-wrap { position:relative; }
+    .update-price-section { background:var(--cream2); border-radius:10px; padding:14px; margin-bottom:12px; }
+    .update-price-section label { font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+    .update-price-row { display:flex; gap:8px; }
+    .update-price-input { flex:1; font-family:'Amatic SC',cursive; font-size:20px; color:var(--olive); background:var(--white); border:1.5px solid var(--border); border-radius:8px; padding:8px 12px; outline:none; }
+    .update-price-btn { font-family:inherit; font-size:13px; color:white; background:var(--navy); border:none; border-radius:8px; padding:8px 16px; cursor:pointer; }
+    .empty-auction { text-align:center; padding:80px 2rem; grid-column:1/-1; }
+    .empty-auction h3 { font-size:32px; color:var(--navy); margin-bottom:10px; }
+    .empty-auction p { font-size:15px; color:var(--muted); margin-bottom:24px; }
+
+    /* CREATE AUCTION */
+    .create-btn { font-family:inherit; font-size:14px; font-weight:400; color:white; background:var(--olive); border:none; border-radius:10px; padding:10px 22px; cursor:pointer; transition:background 0.18s; display:inline-flex; align-items:center; gap:8px; }
+    .create-btn:hover { background:var(--olive-dark); }
+    .create-modal-box { background:var(--white); border-radius:20px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); padding:28px 32px; }
+    .create-modal-box h2 { font-size:32px; color:var(--navy); margin-bottom:20px; }
+    .form-group { margin-bottom:16px; }
+    .form-label { display:block; font-size:13px; color:var(--navy); margin-bottom:7px; }
+    .form-input { width:100%; font-family:inherit; font-size:14px; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:9px; padding:12px 14px; outline:none; transition:border-color 0.18s; box-sizing:border-box; }
+    .form-input:focus { border-color:var(--olive); background:var(--white); }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .btn-create-submit { width:100%; font-family:inherit; font-size:15px; color:white; background:var(--olive); border:none; border-radius:10px; padding:14px; cursor:pointer; margin-top:8px; }
+    .auction-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+    .auction-count { font-size:14px; color:var(--muted); }
+
+    @media (max-width: 768px) {
+      .auction-hero { padding:32px 14px 28px; }
+      .auction-hero h1 { font-size:36px; }
+      .auction-hero-stats { gap:20px; }
+      .auction-tabs { padding:0 8px; }
+      .auction-tab { padding:12px 12px; font-size:12.5px; }
+      .auction-wrap { padding:20px 12px 80px; }
+      .auction-grid { grid-template-columns:1fr; gap:14px; }
+      .modal-price-row { grid-template-columns:1fr 1fr; }
+      .create-modal-box { padding:20px 16px; }
+      .form-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+ <div style="position:relative;">
+  <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="catalog-dropdown">
+    <div class="dropdown-sub">
+    <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+        🛍️ Məhsullar
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="dropdown-sub-menu">
+        <a href="category.html">Hamısı</a>
+        <a href="category.html?cat=Qadın">👗 Qadın</a>
+        <a href="category.html?cat=Kişi">👔 Kişi</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+        <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+        <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+        <a href="category.html?cat=İdman">🏃 İdman</a>
+        <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+        <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+        <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+        <a href="category.html?cat=Baxım">💄 Baxım</a>
+        <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+        <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+        <a href="category.html?cat=Digər">📦 Digər</a>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-section-label">✨ Xüsusi</div>
+    <a href="auction.html">🔨 Auksiyon</a>
+    <a href="swipe.html">💫 Kəşf et</a>
+    <a href="feed.html">📱 Feed</a>
+  </div>
+</div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Auksiyon axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="auction-hero">
+  <h1>🔨 Auksiyon</h1>
+  <p>Real vaxtda tender edin, ən yaxşı qiymətlə qazanın</p>
+  <div class="auction-hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num" id="heroActive">—</div><div class="hero-stat-label">Aktiv auksiyon</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" id="heroEnding">—</div><div class="hero-stat-label">Bu gün bitiр</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" id="heroTotal">—</div><div class="hero-stat-label">Ümumi təklif</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="auction-tabs">
+  <button class="auction-tab active" onclick="filterAuctions('all',this)">Hamısı</button>
+  <button class="auction-tab" onclick="filterAuctions('timed',this)">⏱ Vaxtlı</button>
+  <button class="auction-tab" onclick="filterAuctions('offer',this)">💬 Təklifli</button>
+  <button class="auction-tab" onclick="filterAuctions('ending',this)">🔥 Tezliklə bitir</button>
+</div>
+
+<!-- CONTENT -->
+<div class="auction-wrap">
+  <div class="auction-header">
+    <span class="auction-count" id="auctionCount"></span>
+    <button class="create-btn" id="createAuctionBtn" onclick="openCreateModal()" style="display:none;">
+      + Auksiyon yarat
+    </button>
+  </div>
+  <div class="auction-grid" id="auctionGrid">
+    <!-- loaded by JS -->
+  </div>
+</div>
+
+<!-- BID MODAL -->
+<div class="modal-overlay" id="bidModal">
+  <div class="modal-wrap" style="width:100%;max-width:560px;">
+    <button class="modal-close" onclick="closeBidModal()">×</button>
+    <div class="modal-box" id="bidModalContent"></div>
+  </div>
+</div>
+
+<!-- CREATE AUCTION MODAL -->
+<div class="modal-overlay" id="createModal">
+  <div class="create-modal-box">
+    <h2>Auksiyon yarat</h2>
+    <div class="form-group">
+      <label class="form-label">Məhsul seç</label>
+      <select class="form-input" id="createProduct">
+        <option value="">Məhsulunuzu seçin...</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Başlanğıc qiyməti (₼)</label>
+        <input class="form-input" type="number" id="createStartPrice" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Min. artım (₼)</label>
+        <input class="form-input" type="number" id="createMinIncrement" placeholder="5" value="5">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Auksiyon növü</label>
+      <select class="form-input" id="createType">
+        <option value="timed">⏱ Vaxtlı — vaxt bitdikdə ən yüksək təklif qazanır</option>
+        <option value="offer">💬 Təklifli — siz razı olduğunuz təklifi seçirsiniz</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bitmə vaxtı</label>
+      <input class="form-input" type="datetime-local" id="createEndsAt">
+    </div>
+    <div id="createStatus" style="font-size:13px;color:var(--muted);margin-bottom:8px;"></div>
+    <button class="btn-create-submit" onclick="submitAuction()">Auksion yarat 🔨</button>
+    <button onclick="document.getElementById('createModal').classList.remove('open')" style="width:100%;font-family:inherit;font-size:13.5px;color:var(--muted);background:none;border:none;cursor:pointer;padding:10px;margin-top:4px;">Ləğv et</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+let currentUser = null;
+let allAuctions = [];
+let currentAuction = null;
+let timerIntervals = {};
+let modalTimerInterval = null;
+
+// ── TIMER HELPER ──
+function timeLeft(endsAt) {
+  const diff = new Date(endsAt) - new Date();
+  if (diff <= 0) return { str: 'Bitdi', urgent: true, ended: true };
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  const urgent = diff < 3600000;
+  if (d > 0) return { str: `${d}g ${h}s`, urgent: false, ended: false };
+  if (h > 0) return { str: `${h}s ${m}d`, urgent, ended: false };
+  return { str: `${m}d ${s}s`, urgent: true, ended: false };
+}
+
+function getImg(images) {
+  if (!images || !images[0]) return null;
+  return getProductImageUrl(images[0]);
+}
+
+// ── LOAD AUCTIONS ──
+async function loadAuctions(filter = 'all') {
+  const grid = document.getElementById('auctionGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">Yüklənir...</div>';
+
+  let query = db.from('auctions_with_details').select('*').eq('is_active', true);
+
+  if (filter === 'timed') query = query.eq('auction_type','timed');
+  else if (filter === 'offer') query = query.eq('auction_type','offer');
+  else if (filter === 'ending') {
+    const soon = new Date(Date.now() + 3600000).toISOString();
+    query = query.lt('ends_at', soon);
+  }
+
+  query = query.order('created_at', { ascending: false });
+  const { data: auctions } = await query;
+  allAuctions = auctions || [];
+
+  // Stats
+  const { count: totalBids } = await db.from('auction_bids').select('*', { count:'exact', head:true });
+  const endingSoon = allAuctions.filter(a => new Date(a.ends_at) - new Date() < 3600000 * 24).length;
+  document.getElementById('heroActive').textContent = allAuctions.length + '+';
+  document.getElementById('heroEnding').textContent = endingSoon;
+  document.getElementById('heroTotal').textContent = (totalBids || 0) + '+';
+  document.getElementById('auctionCount').textContent = allAuctions.length + ' auksiyon';
+
+  // Clear old timers
+  Object.values(timerIntervals).forEach(clearInterval);
+  timerIntervals = {};
+
+  if (!allAuctions.length) {
+    grid.innerHTML = `
+      <div class="empty-auction">
+        <div style="font-size:56px;margin-bottom:16px;">🔨</div>
+        <h3>Hələ auksiyon yoxdur</h3>
+        <p>İlk auksiyonu sən yarat!</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = allAuctions.map(a => renderCard(a)).join('');
+
+  // Start timers
+  allAuctions.forEach(a => {
+    if (a.auction_type === 'timed') {
+      timerIntervals[a.id] = setInterval(() => {
+        const el = document.getElementById('timer_' + a.id);
+        if (!el) { clearInterval(timerIntervals[a.id]); return; }
+        const t = timeLeft(a.ends_at);
+        el.textContent = t.str;
+        el.className = 'acard-timer-val' + (t.urgent ? ' urgent' : '');
+      }, 1000);
+    }
+  });
+}
+
+function renderCard(a) {
+  const img = getImg(a.images);
+  const price = a.highest_bid || a.current_price;
+  const t = a.auction_type === 'timed' ? timeLeft(a.ends_at) : null;
+  const isApproved = a.seller_approved_bid;
+
+  return `
+    <div class="acard" onclick="openBidModal('${a.id}')">
+      <div class="acard-img">
+        ${img ? `<img src="${img}" alt="${a.title}">` : '👗'}
+        <span class="acard-type ${a.auction_type === 'timed' ? 'type-timed' : 'type-offer'}">
+          ${a.auction_type === 'timed' ? '⏱ Vaxtlı' : '💬 Təklifli'}
+        </span>
+        ${a.auction_type === 'timed' ? `
+          <div class="acard-timer">
+            <div><div class="acard-timer-label">Qalan vaxt</div></div>
+            <div class="acard-timer-val ${t.urgent ? 'urgent' : ''}" id="timer_${a.id}">${t.str}</div>
+          </div>` : ''}
+      </div>
+      <div class="acard-body">
+        <div class="acard-brand">${a.brand || ''}</div>
+        <div class="acard-title">${a.title}</div>
+        ${isApproved ? `<div class="seller-approved">✅ Satıcı bu qiymetə razıdır</div>` : ''}
+        <div class="acard-prices">
+          <div class="acard-current">
+            <div class="acard-current-label">${a.bid_count > 0 ? 'Ən yüksək təklif' : 'Başlanğıc'}</div>
+            <div class="acard-current-price">₼${price}</div>
+          </div>
+          <div class="acard-start">
+            <div class="acard-start-label">Başlanğıc</div>
+            <div class="acard-start-price">₼${a.start_price}</div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div class="acard-bids"><span>${a.bid_count}</span> təklif</div>
+          <div class="acard-seller">
+            <div class="acard-seller-av">
+              ${a.seller_avatar ? `<img src="${a.seller_avatar}">` : '👤'}
+            </div>
+            ${a.seller_name || 'İstifadəçi'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── BID MODAL ──
+async function openBidModal(auctionId) {
+  const a = allAuctions.find(x => x.id === auctionId);
+  if (!a) return;
+  currentAuction = a;
+
+  const modal = document.getElementById('bidModal');
+  modal.classList.add('open');
+  await renderBidModal(a);
+}
+
+async function renderBidModal(a) {
+  const { data: bids } = await db
+    .from('auction_bids')
+    .select('*, bidder:profiles!auction_bids_bidder_id_fkey(full_name,avatar_url)')
+    .eq('auction_id', a.id)
+    .order('amount', { ascending: false });
+
+  const price = a.highest_bid || a.current_price;
+  const minBid = price + (a.min_increment || 5);
+  const img = getImg(a.images);
+  const isOwner = currentUser && currentUser.id === a.seller_id;
+  const isTimed = a.auction_type === 'timed';
+  const t = isTimed ? timeLeft(a.ends_at) : null;
+  const ended = isTimed && t.ended;
+  const topBid = bids && bids[0];
+  const isApproved = a.seller_approved_bid;
+
+  if (modalTimerInterval) clearInterval(modalTimerInterval);
+
+  document.getElementById('bidModalContent').innerHTML = `
+    <div class="modal-img">
+      ${img ? `<img src="${img}" alt="${a.title}">` : '👗'}
+    </div>
+    <div class="modal-body">
+      <div class="modal-brand">${a.brand || ''} ${a.size ? '· ' + a.size : ''}</div>
+      <div class="modal-title">${a.title}</div>
+
+      ${isTimed ? `
+        <div class="modal-timer-box">
+          <div>
+            <div class="modal-timer-label">${ended ? 'Auksiyon' : 'Qalan vaxt'}</div>
+            <div class="modal-timer-val ${t.urgent ? 'urgent' : ''}" id="modalTimer">
+              ${ended ? 'Bitdi' : t.str}
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="modal-timer-label">Bitmə tarixi</div>
+            <div style="font-size:13px;color:rgba(255,255,255,0.7);">${new Date(a.ends_at).toLocaleString('en-GB')}</div>
+          </div>
+        </div>` : ''}
+
+      <div class="modal-price-row">
+        <div class="modal-price-box highlight">
+          <div class="modal-price-box-label">${bids && bids.length > 0 ? 'Ən yüksək' : 'Başlanğıc'}</div>
+          <div class="modal-price-box-val">₼${price}</div>
+        </div>
+        <div class="modal-price-box">
+          <div class="modal-price-box-label">Başlanğıc</div>
+          <div class="modal-price-box-val">₼${a.start_price}</div>
+        </div>
+        <div class="modal-price-box">
+          <div class="modal-price-box-label">Təklif sayı</div>
+          <div class="modal-price-box-val">${bids ? bids.length : 0}</div>
+        </div>
+      </div>
+
+      ${isApproved ? `
+        <div class="seller-approved-badge">
+          ✅ Satıcı bu qiymətə razıdır — daha yüksək təklif olmasa bu alıcı qalib gəlir
+        </div>` : ''}
+
+      ${bids && bids.length > 0 ? `
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Təkliflər</div>
+        <div class="modal-bids-list">
+          ${bids.map((b, i) => `
+            <div class="modal-bid-item">
+              <div class="modal-bid-av">
+                ${b.bidder?.avatar_url ? `<img src="${b.bidder.avatar_url}">` : '👤'}
+              </div>
+              <div>
+                <div class="modal-bid-name">${b.bidder?.full_name || 'İstifadəçi'} ${i === 0 ? '🏆' : ''}</div>
+                <div class="modal-bid-time">${new Date(b.created_at).toLocaleString('en-GB')}</div>
+              </div>
+              <div class="modal-bid-amount ${i === 0 ? 'top' : ''}">₼${b.amount}</div>
+              ${isOwner && a.auction_type === 'offer' && !isApproved ? `
+                <button onclick="approveBid('${b.id}','${a.id}')" style="font-family:inherit;font-size:12px;color:white;background:#2ecc71;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;white-space:nowrap;">✅ Razıyam</button>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>` : `
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:14px;">
+          Hələ təklif yoxdur. İlk sən ol!
+        </div>`}
+
+      ${isOwner ? `
+        <div class="update-price-section">
+          <label>Minimum qiyməti dəyiş (cari: ₼${a.current_price})</label>
+          <div class="update-price-row">
+            <input class="update-price-input" type="number" id="newMinPrice" placeholder="Yeni qiymət">
+            <button class="update-price-btn" onclick="updateMinPrice('${a.id}')">Yenilə</button>
+          </div>
+        </div>` : ''}
+
+      ${!isOwner && !ended ? `
+        <div id="bidSection">
+          ${!currentUser ? `
+            <a href="login.html" style="display:block;text-align:center;font-family:inherit;font-size:15px;color:white;background:var(--olive);border-radius:10px;padding:13px;text-decoration:none;">Giriş et və təklif ver</a>
+          ` : `
+            <div class="bid-input-row">
+              <input class="bid-input" type="number" id="bidAmount" placeholder="₼${minBid}" min="${minBid}" step="${a.min_increment}">
+              <button class="bid-btn" onclick="submitBid('${a.id}',${minBid},${a.min_increment})">Təklif ver 🔨</button>
+            </div>
+            <div class="bid-hint">Minimum təklif: ₼${minBid} (min. artım: ₼${a.min_increment})</div>
+          `}
+        </div>` : ''}
+
+      ${ended && topBid ? `
+        <div style="background:#d4f5e2;border:1px solid #2ecc71;border-radius:10px;padding:16px;text-align:center;">
+          <div style="font-size:24px;margin-bottom:6px;">🏆</div>
+          <div style="font-size:15px;font-weight:400;color:#1a7a40;">${topBid.bidder?.full_name || 'İstifadəçi'} qalib gəldi!</div>
+          <div style="font-family:'Amatic SC',cursive;font-size:28px;color:var(--olive);">₼${topBid.amount}</div>
+        </div>` : ''}
+    </div>`;
+
+  // Modal timer
+  if (isTimed && !ended) {
+    modalTimerInterval = setInterval(() => {
+      const el = document.getElementById('modalTimer');
+      if (!el) { clearInterval(modalTimerInterval); return; }
+      const t2 = timeLeft(a.ends_at);
+      el.textContent = t2.str;
+      el.className = 'modal-timer-val' + (t2.urgent ? ' urgent' : '');
+    }, 1000);
+  }
+}
+
+function closeBidModal() {
+  document.getElementById('bidModal').classList.remove('open');
+  if (modalTimerInterval) clearInterval(modalTimerInterval);
+  currentAuction = null;
+}
+
+// ── SUBMIT BID ──
+async function submitBid(auctionId, minBid, minIncrement) {
+  const amount = parseFloat(document.getElementById('bidAmount').value);
+  if (!amount || amount < minBid) {
+    alert('Minimum təklif: ₼' + minBid);
+    return;
+  }
+
+  const btn = document.querySelector('.bid-btn');
+  btn.disabled = true;
+  btn.textContent = 'Göndərilir...';
+
+  const { error } = await db.from('auction_bids').insert({
+    auction_id: auctionId,
+    bidder_id: currentUser.id,
+    amount
+  });
+
+  if (error) {
+    alert('Xəta baş verdi.');
+    btn.disabled = false;
+    btn.textContent = 'Təklif ver 🔨';
+    return;
+  }
+
+  // Update current_price
+  await db.from('auctions').update({ current_price: amount }).eq('id', auctionId);
+
+  // Reload
+  const idx = allAuctions.findIndex(a => a.id === auctionId);
+  if (idx !== -1) {
+    allAuctions[idx].current_price = amount;
+    allAuctions[idx].highest_bid = amount;
+    allAuctions[idx].bid_count = (allAuctions[idx].bid_count || 0) + 1;
+  }
+
+  await renderBidModal(allAuctions.find(a => a.id === auctionId));
+  loadAuctions();
+}
+
+// ── APPROVE BID (Satıcı razıdır) ──
+async function approveBid(bidId, auctionId) {
+  await db.from('auctions').update({ seller_approved_bid: bidId }).eq('id', auctionId);
+  const idx = allAuctions.findIndex(a => a.id === auctionId);
+  if (idx !== -1) allAuctions[idx].seller_approved_bid = bidId;
+  await renderBidModal(allAuctions[idx]);
+  loadAuctions();
+}
+
+// ── UPDATE MIN PRICE ──
+async function updateMinPrice(auctionId) {
+  const newPrice = parseFloat(document.getElementById('newMinPrice').value);
+  if (!newPrice || newPrice <= 0) { alert('Düzgün qiymət daxil edin'); return; }
+  await db.from('auctions').update({ current_price: newPrice, start_price: newPrice }).eq('id', auctionId);
+  const idx = allAuctions.findIndex(a => a.id === auctionId);
+  if (idx !== -1) { allAuctions[idx].current_price = newPrice; allAuctions[idx].start_price = newPrice; }
+  await renderBidModal(allAuctions.find(a => a.id === auctionId));
+  alert('Qiymət yeniləndi!');
+}
+
+// ── CREATE AUCTION ──
+async function openCreateModal() {
+  if (!currentUser) { location.href = 'login.html'; return; }
+
+  // Load user's products
+  const { data: products } = await db.from('products').select('id,title').eq('seller_id', currentUser.id).eq('is_sold', false).eq('is_active', true);
+  const sel = document.getElementById('createProduct');
+  sel.innerHTML = '<option value="">Məhsulunuzu seçin...</option>';
+  (products || []).forEach(p => {
+    sel.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+  });
+
+  // Default ends_at: 24 saat sonra
+  const def = new Date(Date.now() + 86400000);
+  def.setSeconds(0);
+  document.getElementById('createEndsAt').value = def.toISOString().slice(0,16);
+
+  document.getElementById('createModal').classList.add('open');
+}
+
+async function submitAuction() {
+  const productId = document.getElementById('createProduct').value;
+  const startPrice = parseFloat(document.getElementById('createStartPrice').value);
+  const minIncrement = parseFloat(document.getElementById('createMinIncrement').value) || 5;
+  const auctionType = document.getElementById('createType').value;
+  const endsAt = document.getElementById('createEndsAt').value;
+  const status = document.getElementById('createStatus');
+
+  if (!productId) { status.textContent = 'Məhsul seçin'; return; }
+  if (!startPrice || startPrice <= 0) { status.textContent = 'Başlanğıc qiyməti daxil edin'; return; }
+  if (!endsAt) { status.textContent = 'Bitmə vaxtını seçin'; return; }
+  if (new Date(endsAt) <= new Date()) { status.textContent = 'Bitmə vaxtı gələcəkdə olmalıdır'; return; }
+
+  status.textContent = 'Yaradılır...';
+
+  const { error } = await db.from('auctions').insert({
+    product_id: productId,
+    seller_id: currentUser.id,
+    start_price: startPrice,
+    current_price: startPrice,
+    min_increment: minIncrement,
+    auction_type: auctionType,
+    ends_at: new Date(endsAt).toISOString()
+  });
+
+  if (error) { status.textContent = 'Xəta: ' + error.message; return; }
+
+  document.getElementById('createModal').classList.remove('open');
+  await loadAuctions();
+  status.textContent = '';
+}
+
+function filterAuctions(type, btn) {
+  document.querySelectorAll('.auction-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  loadAuctions(type);
+}
+
+// Close modals on overlay click
+document.getElementById('bidModal').addEventListener('click', function(e) {
+  if (e.target === this) closeBidModal();
+});
+document.getElementById('createModal').addEventListener('click', function(e) {
+  if (e.target === this) document.getElementById('createModal').classList.remove('open');
+});
+
+// Init
+(async () => {
+  currentUser = await getCurrentUser();
+  updateNavAuth();
+  if (currentUser) document.getElementById('createAuctionBtn').style.display = 'inline-flex';
+  loadAuctions();
+})();
+</script>
+
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+</body>
+</html>

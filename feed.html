@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Feed — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .feed-wrap { max-width:600px; margin:0 auto; padding:24px 16px 80px; }
+
+    /* CREATE POST */
+    .create-post { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:20px; }
+    .create-post-top { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .create-avatar { width:40px; height:40px; border-radius:50%; background:var(--cream2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; overflow:hidden; flex-shrink:0; }
+    .create-avatar img { width:100%; height:100%; object-fit:cover; }
+    .create-input { flex:1; font-family:inherit; font-size:14px; font-weight:300; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; outline:none; resize:none; min-height:44px; max-height:120px; transition:border-color 0.18s; }
+    .create-input:focus { border-color:var(--olive); background:var(--white); }
+    .create-post-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .create-action-btn { font-family:inherit; font-size:13px; font-weight:300; color:var(--muted); background:none; border:1.5px solid var(--border); border-radius:8px; padding:7px 12px; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.15s; }
+    .create-action-btn:hover { border-color:var(--olive); color:var(--olive); }
+    .create-submit { margin-left:auto; font-family:inherit; font-size:14px; font-weight:400; color:white; background:var(--olive); border:none; border-radius:8px; padding:8px 20px; cursor:pointer; transition:background 0.18s; }
+    .create-submit:hover { background:var(--olive-dark); }
+    .create-submit:disabled { opacity:0.6; cursor:not-allowed; }
+    .create-imgs-preview { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .create-img-thumb { position:relative; width:80px; height:80px; border-radius:8px; overflow:hidden; border:1px solid var(--border); }
+    .create-img-thumb img { width:100%; height:100%; object-fit:cover; }
+    .create-img-remove { position:absolute; top:2px; right:2px; width:18px; height:18px; background:rgba(0,0,0,0.6); border:none; border-radius:50%; color:white; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .create-product-tag { display:flex; align-items:center; gap:8px; background:var(--cream2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-top:8px; font-size:13px; color:var(--navy); }
+    .create-product-tag button { margin-left:auto; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; }
+    #postImgInput { display:none; }
+    #postProductSelect { display:none; background:var(--white); border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:8px; width:100%; }
+    #postProductSelect select { width:100%; font-family:inherit; font-size:13.5px; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:8px; padding:10px 12px; outline:none; }
+
+    /* POST CARD */
+    .post-card { background:var(--white); border:1px solid var(--border); border-radius:16px; margin-bottom:16px; overflow:hidden; }
+    .post-header { display:flex; align-items:center; gap:10px; padding:14px 16px 10px; }
+    .post-avatar { width:38px; height:38px; border-radius:50%; background:var(--cream2); border:1px solid var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; text-decoration:none; }
+    .post-avatar img { width:100%; height:100%; object-fit:cover; }
+    .post-author { font-size:14px; font-weight:400; color:var(--navy); text-decoration:none; }
+    .post-author:hover { color:var(--olive); }
+    .post-time { font-size:12px; color:var(--muted); }
+    .post-more { margin-left:auto; background:none; border:none; cursor:pointer; color:var(--muted); font-size:18px; padding:0 4px; }
+    .post-content { padding:0 16px 12px; font-size:14px; color:var(--navy); line-height:1.6; white-space:pre-wrap; }
+    .post-images { display:grid; gap:2px; }
+    .post-images.one img { width:100%; max-height:400px; object-fit:cover; cursor:pointer; }
+    .post-images.two { grid-template-columns:1fr 1fr; }
+    .post-images.two img { width:100%; height:240px; object-fit:cover; cursor:pointer; }
+    .post-images.three { grid-template-columns:1fr 1fr; grid-template-rows:200px 200px; }
+    .post-images.three img:first-child { grid-row:1/3; height:100%; object-fit:cover; cursor:pointer; }
+    .post-images.three img { width:100%; height:200px; object-fit:cover; cursor:pointer; }
+    .post-images img:hover { opacity:0.92; }
+    .post-product { margin:10px 16px; border:1px solid var(--border); border-radius:10px; overflow:hidden; display:flex; text-decoration:none; transition:border-color 0.18s; }
+    .post-product:hover { border-color:var(--olive); }
+    .post-product-img { width:72px; height:72px; object-fit:cover; flex-shrink:0; background:var(--cream2); }
+    .post-product-info { padding:10px 12px; }
+    .post-product-title { font-size:13.5px; color:var(--navy); margin-bottom:4px; }
+    .post-product-price { font-family:'Amatic SC',cursive; font-size:20px; font-weight:700; color:var(--olive); }
+    .post-actions { display:flex; align-items:center; gap:0; padding:8px 8px; border-top:1px solid var(--border); }
+    .post-action { flex:1; font-family:inherit; font-size:13px; font-weight:300; color:var(--muted); background:none; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border-radius:8px; transition:all 0.15s; }
+    .post-action:hover { background:var(--cream2); color:var(--navy); }
+    .post-action.liked { color:#e74c3c; }
+    .post-action.liked svg { fill:#e74c3c; stroke:#e74c3c; }
+
+    /* COMMENTS */
+    .post-comments { padding:10px 16px 14px; border-top:1px solid var(--border); display:none; }
+    .post-comments.open { display:block; }
+    .comment-item { display:flex; gap:8px; margin-bottom:10px; }
+    .comment-avatar { width:28px; height:28px; border-radius:50%; background:var(--cream2); border:1px solid var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+    .comment-avatar img { width:100%; height:100%; object-fit:cover; }
+    .comment-bubble { background:var(--cream2); border-radius:10px; padding:8px 12px; flex:1; }
+    .comment-author { font-size:12px; font-weight:400; color:var(--navy); margin-bottom:2px; }
+    .comment-text { font-size:13.5px; color:var(--navy); line-height:1.5; }
+    .comment-input-row { display:flex; gap:8px; margin-top:10px; }
+    .comment-input { flex:1; font-family:inherit; font-size:13.5px; font-weight:300; background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:9px 12px; outline:none; }
+    .comment-input:focus { border-color:var(--olive); background:var(--white); }
+    .comment-send { font-family:inherit; font-size:13px; color:white; background:var(--olive); border:none; border-radius:8px; padding:9px 16px; cursor:pointer; }
+    .comment-actions { display:flex; gap:6px; margin-top:4px; }
+    .comment-action-btn { font-family:inherit; font-size:11px; color:var(--muted); background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:4px; transition:all 0.15s; }
+    .comment-action-btn:hover { color:var(--navy); background:var(--border); }
+    .comment-action-btn.del:hover { color:#d94f4f; }
+    .comment-editing { display:none; }
+    .comment-editing.show { display:flex; gap:6px; margin-top:6px; }
+    .comment-edit-input { flex:1; font-family:inherit; font-size:13px; background:var(--white); border:1.5px solid var(--olive); border-radius:8px; padding:6px 10px; outline:none; }
+    .comment-edit-save { font-family:inherit; font-size:12px; color:white; background:var(--olive); border:none; border-radius:6px; padding:6px 12px; cursor:pointer; }
+    .comment-edit-cancel { font-family:inherit; font-size:12px; color:var(--muted); background:none; border:1.5px solid var(--border); border-radius:6px; padding:6px 10px; cursor:pointer; }
+
+    /* IMAGE LIGHTBOX */
+    .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:2000; align-items:center; justify-content:center; }
+    .lightbox.open { display:flex; }
+    .lightbox img { max-width:90vw; max-height:90vh; object-fit:contain; border-radius:8px; }
+    .lightbox-close { position:absolute; top:16px; right:16px; background:none; border:none; color:white; font-size:28px; cursor:pointer; }
+
+    /* SKELETON */
+    .post-skeleton { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:16px; }
+    .skel { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    @media (max-width: 768px) {
+      .feed-wrap { padding:12px 8px 80px; }
+      .post-images.two img { height:160px; }
+      .post-images.three img { height:140px; }
+      .post-images.three img:first-child { height:100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <button class="-btn">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Feed-də axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" href="auction.html" style="border-color:var(--olive);color:var(--olive);">🔨 Auksiyon</a>
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close">×</button>
+  <img id="lightboxImg" src="">
+</div>
+
+<div class="feed-wrap">
+
+  <!-- CREATE POST -->
+  <div class="create-post" id="createPostBox" style="display:none;">
+    <div class="create-post-top">
+      <div class="create-avatar" id="createAvatar">👤</div>
+      <textarea class="create-input" id="postText" placeholder="Nə düşünürsən? Geyimini paylaş..." rows="1" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    </div>
+    <div class="create-imgs-preview" id="createImgsPreview"></div>
+    <div id="createProductTag"></div>
+    <div id="postProductSelect">
+      <select id="productSelectEl" onchange="tagProduct(this)">
+        <option value="">Məhsul seç...</option>
+      </select>
+    </div>
+    <div class="create-post-actions">
+      <button class="create-action-btn" onclick="document.getElementById('postImgInput').click()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Şəkil
+      </button>
+      <button class="create-action-btn" onclick="toggleProductSelect()">
+        🏷️ Məhsul
+      </button>
+      <input type="file" id="postImgInput" accept="image/*" multiple onchange="addPostImages(this)">
+      <button class="create-submit" onclick="submitPost()" id="postSubmitBtn">Paylaş</button>
+    </div>
+  </div>
+
+  <!-- LOGIN PROMPT -->
+  <div id="loginPrompt" style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;margin-bottom:20px;display:none;">
+    <div style="font-size:32px;margin-bottom:8px;">👗</div>
+    <h3 style="font-size:22px;color:var(--navy);margin-bottom:6px;">Feed-ə qoşul</h3>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Geyimlərini paylaş, digərlərin stilini kəşf et</p>
+    <a href="login.html" style="font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:10px;padding:11px 28px;text-decoration:none;display:inline-block;">Giriş et</a>
+  </div>
+
+  <!-- FEED -->
+  <div id="feedContainer">
+    <div class="post-skeleton"><div class="skel" style="height:40px;margin-bottom:10px;"></div><div class="skel" style="height:200px;margin-bottom:10px;"></div><div class="skel" style="height:20px;width:60%;"></div></div>
+    <div class="post-skeleton"><div class="skel" style="height:40px;margin-bottom:10px;"></div><div class="skel" style="height:160px;margin-bottom:10px;"></div><div class="skel" style="height:20px;width:40%;"></div></div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="feed.html" class="bnav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Feed</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+let currentUser = null;
+let currentProfile = null;
+let postImages = [];
+let taggedProduct = null;
+
+// ── INIT ──
+(async () => {
+  currentUser = await getCurrentUser();
+  updateNavAuth();
+
+  if (currentUser) {
+    const { data: profile } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
+    currentProfile = profile;
+    document.getElementById('createPostBox').style.display = 'block';
+    if (profile?.avatar_url) {
+      document.getElementById('createAvatar').innerHTML = `<img src="${profile.avatar_url}">`;
+    }
+    // Load user's products for tagging
+    const { data: prods } = await db.from('products').select('id,title').eq('seller_id', currentUser.id).eq('is_active', true);
+    const sel = document.getElementById('productSelectEl');
+    (prods || []).forEach(p => {
+      sel.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+    });
+  } else {
+    document.getElementById('loginPrompt').style.display = 'block';
+  }
+
+  loadFeed();
+})();
+
+// ── LOAD FEED ──
+async function loadFeed() {
+  const { data: posts } = await db
+    .from('posts_with_details')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  const container = document.getElementById('feedContainer');
+
+  if (!posts || posts.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:var(--muted);">
+        <div style="font-size:48px;margin-bottom:12px;">✨</div>
+        <h3 style="font-size:26px;color:var(--navy);margin-bottom:8px;">Hələ post yoxdur</h3>
+        <p>İlk postu sən yarat!</p>
+      </div>`;
+    return;
+  }
+
+  // Get user's likes
+  let userLikes = new Set();
+  if (currentUser) {
+    const { data: likes } = await db.from('post_likes').select('post_id').eq('user_id', currentUser.id);
+    (likes || []).forEach(l => userLikes.add(l.post_id));
+  }
+
+  container.innerHTML = posts.map(p => renderPost(p, userLikes)).join('');
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr);
+  const m = Math.floor(diff / 60000);
+  const h = Math.floor(diff / 3600000);
+  const d = Math.floor(diff / 86400000);
+  if (m < 1) return 'indi';
+  if (m < 60) return m + ' dəq əvvəl';
+  if (h < 24) return h + ' saat əvvəl';
+  return d + ' gün əvvəl';
+}
+
+function renderPost(p, userLikes) {
+  const liked = userLikes && userLikes.has(p.id);
+  const imgs = p.images || [];
+  const imgClass = imgs.length === 1 ? 'one' : imgs.length === 2 ? 'two' : 'three';
+
+  const imgsHtml = imgs.length > 0 ? `
+    <div class="post-images ${imgClass}">
+      ${imgs.slice(0,3).map(img => `<img src="${getProductImageUrl(img)}" onclick="openLightbox('${getProductImageUrl(img)}')" loading="lazy">`).join('')}
+    </div>` : '';
+
+  const productHtml = p.product_id ? `
+    <a class="post-product" href="product.html?id=${p.product_id}">
+      ${p.product_images && p.product_images[0]
+        ? `<img class="post-product-img" src="${getProductImageUrl(p.product_images[0])}">`
+        : `<div class="post-product-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">👗</div>`}
+      <div class="post-product-info">
+        <div class="post-product-title">${p.product_title || ''}</div>
+        <div class="post-product-price">${p.product_price ? '₼' + p.product_price : ''}</div>
+      </div>
+    </a>` : '';
+
+  const isOwn = currentUser && currentUser.id === p.user_id;
+
+  return `
+    <div class="post-card" id="post_${p.id}">
+      <div class="post-header">
+        <a class="post-avatar" href="profile.html?id=${p.user_id}">
+          ${p.author_avatar ? `<img src="${p.author_avatar}">` : '👤'}
+        </a>
+        <div>
+          <a class="post-author" href="profile.html?id=${p.user_id}">${p.author_name || 'İstifadəçi'}</a>
+          <div class="post-time">${timeAgo(p.created_at)}</div>
+        </div>
+        ${isOwn ? `<button class="post-more" onclick="deletePost('${p.id}')">⋯</button>` : ''}
+      </div>
+      ${p.content ? `<div class="post-content">${p.content}</div>` : ''}
+      ${imgsHtml}
+      ${productHtml}
+      <div class="post-actions">
+        <button class="post-action ${liked ? 'liked' : ''}" onclick="toggleLike('${p.id}',this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <span id="likes_${p.id}">${p.likes_count || 0}</span>
+        </button>
+        <button class="post-action" onclick="toggleComments('${p.id}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span id="comments_${p.id}">${p.comments_count || 0}</span>
+        </button>
+        <button class="post-action" onclick="sharePost('${p.id}')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Paylaş
+        </button>
+      </div>
+      <div class="post-comments" id="comments_section_${p.id}"></div>
+    </div>`;
+}
+
+// ── LIKE ──
+async function toggleLike(postId, btn) {
+  if (!currentUser) { location.href = 'login.html'; return; }
+
+  const liked = btn.classList.contains('liked');
+  const countEl = document.getElementById('likes_' + postId);
+  let count = parseInt(countEl.textContent);
+
+  if (liked) {
+    await db.from('post_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+    btn.classList.remove('liked');
+    btn.querySelector('svg').setAttribute('fill', 'none');
+    countEl.textContent = Math.max(0, count - 1);
+  } else {
+    await db.from('post_likes').insert({ post_id: postId, user_id: currentUser.id });
+    btn.classList.add('liked');
+    btn.querySelector('svg').setAttribute('fill', 'currentColor');
+    countEl.textContent = count + 1;
+  }
+}
+
+// ── COMMENTS ──
+async function toggleComments(postId) {
+  const section = document.getElementById('comments_section_' + postId);
+  if (section.classList.contains('open')) {
+    section.classList.remove('open');
+    return;
+  }
+  section.classList.add('open');
+  await loadComments(postId);
+}
+
+async function loadComments(postId) {
+  const { data: comments } = await db
+    .from('post_comments')
+    .select('*, author:profiles!post_comments_user_id_fkey(full_name,avatar_url)')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+
+  const section = document.getElementById('comments_section_' + postId);
+  const commentsHtml = (comments || []).map(c => {
+    const isOwn = currentUser && currentUser.id === c.user_id;
+    return `
+    <div class="comment-item" id="comment_${c.id}">
+      <div class="comment-avatar">
+        ${c.author?.avatar_url ? `<img src="${c.author.avatar_url}">` : '👤'}
+      </div>
+      <div class="comment-bubble" style="flex:1;">
+        <div class="comment-author">${c.author?.full_name || 'İstifadəçi'}</div>
+        <div class="comment-text" id="comment_text_${c.id}">${c.content}</div>
+        <div class="comment-editing" id="comment_edit_${c.id}">
+          <input class="comment-edit-input" id="comment_edit_input_${c.id}" value="${c.content.replace(/"/g, '&quot;')}">
+          <button class="comment-edit-save" onclick="saveComment('${c.id}','${postId}')">✓</button>
+          <button class="comment-edit-cancel" onclick="cancelEdit('${c.id}')">✕</button>
+        </div>
+        ${isOwn ? `
+        <div class="comment-actions">
+          <button class="comment-action-btn" onclick="startEdit('${c.id}')">Düzəlt</button>
+          <button class="comment-action-btn del" onclick="deleteComment('${c.id}','${postId}')">Sil</button>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  section.innerHTML = commentsHtml + `
+    <div class="comment-input-row">
+      <input class="comment-input" id="comment_input_${postId}" placeholder="Şərh yaz..." onkeydown="if(event.key==='Enter')addComment('${postId}')">
+      <button class="comment-send" onclick="addComment('${postId}')">→</button>
+    </div>`;
+}
+
+function startEdit(commentId) {
+  document.getElementById('comment_text_' + commentId).style.display = 'none';
+  document.getElementById('comment_edit_' + commentId).classList.add('show');
+  document.getElementById('comment_edit_input_' + commentId).focus();
+}
+
+function cancelEdit(commentId) {
+  document.getElementById('comment_text_' + commentId).style.display = 'block';
+  document.getElementById('comment_edit_' + commentId).classList.remove('show');
+}
+
+async function saveComment(commentId, postId) {
+  const newText = document.getElementById('comment_edit_input_' + commentId).value.trim();
+  if (!newText) return;
+  await db.from('post_comments').update({ content: newText }).eq('id', commentId);
+  document.getElementById('comment_text_' + commentId).textContent = newText;
+  cancelEdit(commentId);
+}
+
+async function deleteComment(commentId, postId) {
+  if (!confirm('Şərhi silmək istəyirsiniz?')) return;
+  await db.from('post_comments').delete().eq('id', commentId);
+  document.getElementById('comment_' + commentId)?.remove();
+  // Sayı azalt
+  const countEl = document.getElementById('comments_' + postId);
+  if (countEl) countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
+}
+
+async function addComment(postId) {
+  if (!currentUser) { location.href = 'login.html'; return; }
+  const input = document.getElementById('comment_input_' + postId);
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  await db.from('post_comments').insert({ post_id: postId, user_id: currentUser.id, content: text });
+  const countEl = document.getElementById('comments_' + postId);
+  if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
+  await loadComments(postId);
+}
+
+// ── SHARE POST ──
+function sharePost(postId) {
+  const url = window.location.origin + '/feed.html#post_' + postId;
+  if (navigator.share) {
+    navigator.share({ title: 'Dolab.az Feed', url });
+  } else {
+    navigator.clipboard.writeText(url).then(() => alert('Link kopyalandı!'));
+  }
+}
+
+// ── CREATE POST ──
+function addPostImages(input) {
+  Array.from(input.files).forEach(file => {
+    postImages.push(file);
+    const reader = new FileReader();
+    const idx = postImages.length - 1;
+    reader.onload = e => {
+      const preview = document.getElementById('createImgsPreview');
+      preview.innerHTML += `
+        <div class="create-img-thumb" id="img_thumb_${idx}">
+          <img src="${e.target.result}">
+          <button class="create-img-remove" onclick="removePostImg(${idx})">×</button>
+        </div>`;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function removePostImg(idx) {
+  postImages[idx] = null;
+  const el = document.getElementById('img_thumb_' + idx);
+  if (el) el.remove();
+}
+
+function toggleProductSelect() {
+  const el = document.getElementById('postProductSelect');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function tagProduct(sel) {
+  const val = sel.value;
+  const text = sel.options[sel.selectedIndex].text;
+  if (!val) { taggedProduct = null; document.getElementById('createProductTag').innerHTML = ''; return; }
+  taggedProduct = val;
+  document.getElementById('createProductTag').innerHTML = `
+    <div class="create-product-tag">
+      🏷️ ${text}
+      <button onclick="taggedProduct=null;document.getElementById('createProductTag').innerHTML='';document.getElementById('productSelectEl').value=''">×</button>
+    </div>`;
+  document.getElementById('postProductSelect').style.display = 'none';
+}
+
+async function submitPost() {
+  const text = document.getElementById('postText').value.trim();
+  const imgs = postImages.filter(f => f !== null);
+  if (!text && imgs.length === 0) { alert('Mətn və ya şəkil əlavə edin'); return; }
+
+  const btn = document.getElementById('postSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Paylaşılır...';
+
+  // Upload images
+  const uploadedPaths = [];
+  for (const file of imgs) {
+    const ext = file.name.split('.').pop();
+    const path = `posts/${currentUser.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await db.storage.from('product-images').upload(path, file, { upsert: true });
+    if (!error) uploadedPaths.push(path);
+  }
+
+  const { error } = await db.from('posts').insert({
+    user_id: currentUser.id,
+    content: text || null,
+    images: uploadedPaths.length > 0 ? uploadedPaths : null,
+    product_id: taggedProduct || null,
+    likes_count: 0,
+    comments_count: 0
+  });
+
+  if (error) { alert('Xəta baş verdi'); btn.disabled = false; btn.textContent = 'Paylaş'; return; }
+
+  document.getElementById('postText').value = '';
+  document.getElementById('createImgsPreview').innerHTML = '';
+  document.getElementById('createProductTag').innerHTML = '';
+  postImages = [];
+  taggedProduct = null;
+  btn.disabled = false;
+  btn.textContent = 'Paylaş';
+  loadFeed();
+}
+
+async function deletePost(postId) {
+  if (!confirm('Postu silmək istəyirsiniz?')) return;
+  await db.from('posts').delete().eq('id', postId);
+  document.getElementById('post_' + postId)?.remove();
+}
+
+// ── LIGHTBOX ──
+function openLightbox(src) {
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+</script>
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+</body>
+</html>

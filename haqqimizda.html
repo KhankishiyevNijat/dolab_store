@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Haqqımızda — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/shared.css" />
+  <style>
+    .page-hero {
+      background: var(--cream2);
+      border-bottom: 1px solid var(--border);
+      padding: 64px 2rem 48px;
+    }
+    .page-hero-inner,
+    .page-content {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .page-title {
+      font-size: 48px;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 760px;
+    }
+    .page-content {
+      padding: 48px 2rem 72px;
+    }
+    .content-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      margin-bottom: 22px;
+    }
+    .content-card h2 {
+      font-size: 32px;
+      color: var(--navy);
+      margin-bottom: 14px;
+    }
+    .content-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.85;
+      margin-bottom: 14px;
+    }
+    .content-card p:last-child {
+      margin-bottom: 0;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .value-box {
+      background: var(--cream2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .value-box h3 {
+      font-size: 24px;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .value-box p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html"><img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;"></a>
+  <div style="position:relative;">
+  <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="catalog-dropdown">
+    <div class="dropdown-sub">
+      <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+        🛍️ Məhsullar
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="dropdown-sub-menu">
+        <a href="category.html">Hamısı</a>
+        <a href="category.html?cat=Qadın">👗 Qadın</a>
+        <a href="category.html?cat=Kişi">👔 Kişi</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+        <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+        <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+        <a href="category.html?cat=İdman">🏃 İdman</a>
+        <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+        <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+        <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+        <a href="category.html?cat=Baxım">💄 Baxım</a>
+        <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+        <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+        <a href="category.html?cat=Digər">📦 Digər</a>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-section-label">✨ Xüsusi</div>
+    <a href="auction.html">🔨 Auksiyon</a>
+    <a href="swipe.html">💫 Kəşf et</a>
+    <a href="feed.html">📱 Feed</a>
+  </div>
+</div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <h1 class="page-title">Haqqımızda</h1>
+    <p class="page-subtitle">
+      Dolab.az Azərbaycanda ikinci əl moda alış-verişini daha rahat, təhlükəsiz və əlçatan etmək məqsədilə yaradılmış platformadır.
+      Biz inanırıq ki, yaxşı vəziyyətdə olan hər bir geyimə ikinci həyat vermək mümkündür.
+    </p>
+  </div>
+</section>
+
+<main class="page-content">
+  <section class="content-card">
+    <h2>Biz kimik?</h2>
+    <p>
+      Dolab.az istifadəçilərin geyim, ayaqqabı, çanta və aksessuarlarını rahat şəkildə satışa çıxara bildiyi, alıcıların isə zövqünə və büdcəsinə uyğun məhsullar tapa bildiyi müasir onlayn platformadır.
+      Məqsədimiz sadəcə satış yaratmaq deyil, eyni zamanda daha düşünülmüş və davamlı istehlak mədəniyyətini təşviq etməkdir.
+    </p>
+    <p>
+      Platformamız sadə istifadəçi təcrübəsi, aydın interfeys və etibarlı ünsiyyət prinsipləri üzərində qurulur.
+      İstəyirik ki, həm satıcı, həm də alıcı burada özünü rahat hiss etsin.
+    </p>
+  </section>
+
+  <section class="content-card">
+    <h2>Missiyamız</h2>
+    <p>
+      Missiyamız istifadə olunmayan geyimləri yenidən dövriyyəyə qaytarmaq, istifadəçilərə əlavə qazanc imkanı yaratmaq və daha məsuliyyətli moda yanaşmasını dəstəkləməkdir.
+      Hər bir məhsulun dəyərini qorumaq və onu yeni sahibinə çatdırmaq bizim əsas məqsədlərimizdəndir.
+    </p>
+
+    <div class="values-grid">
+      <div class="value-box">
+        <h3>Etibar</h3>
+        <p>İstifadəçilər arasında hörmətli, dürüst və təhlükəsiz alış-veriş mühiti yaratmağa çalışırıq.</p>
+      </div>
+      <div class="value-box">
+        <h3>Sadəlik</h3>
+        <p>Məhsul yerləşdirmək, baxmaq və əlaqə qurmaq prosesini mümkün qədər rahat saxlayırıq.</p>
+      </div>
+      <div class="value-box">
+        <h3>Davamlılıq</h3>
+        <p>İkinci əl istifadəsini təşviq etməklə daha məsuliyyətli istehlak vərdişlərinə töhfə vermək istəyirik.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-card">
+    <h2>Niyə Dolab.az?</h2>
+    <p>
+      Çünki hər kəsin dolabında istifadə olunmayan, amma hələ də dəyərli olan məhsullar var.
+      Biz həmin məhsulları yeni alıcılarla bir araya gətirən rahat bir məkan yaratmaq istəyirik.
+    </p>
+    <p>
+      Dolab.az təkcə alış-veriş platforması deyil — bu, stilini yeniləmək, artıq istifadə etmədiyin məhsullardan qazanc əldə etmək və daha şüurlu seçimlər etmək üçün yaradılmış bir icmadır.
+    </p>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>updateNavAuth();</script>
+<nav class="mobile-bottom-nav">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="#" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sevimlilər — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .page-hero { background:var(--cream2); border-bottom:1px solid var(--border); padding:40px 2.5rem 32px; }
+    .page-hero-inner { max-width:1160px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .page-title { font-size:40px; color:var(--navy); }
+    .fav-count { font-size:15px; color:var(--muted); font-weight:300; }
+    .page-content { max-width:1160px; margin:0 auto; padding:36px 2rem 80px; }
+    .empty-state { text-align:center; padding:80px 2rem; color:var(--muted); }
+    .empty-state .empty-icon { font-size:56px; margin-bottom:16px; }
+    .empty-state h3 { font-size:32px; color:var(--navy); margin-bottom:10px; }
+    .empty-state p { font-size:15px; margin-bottom:24px; }
+    .btn-browse { font-family:inherit; font-size:15px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:10px; padding:13px 32px; cursor:pointer; transition:background 0.18s; text-decoration:none; display:inline-block; }
+    .btn-browse:hover { background:var(--olive-dark); }
+    .skeleton { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:14px; height:300px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    @media (max-width: 768px) {
+      .page-hero { padding: 24px 14px 20px; }
+      .page-title { font-size:30px; }
+      .page-content { padding: 20px 12px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+  <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="catalog-dropdown">
+    <div class="dropdown-sub">
+      <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+        🛍️ Məhsullar
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="dropdown-sub-menu">
+        <a href="category.html">Hamısı</a>
+        <a href="category.html?cat=Qadın">👗 Qadın</a>
+        <a href="category.html?cat=Kişi">👔 Kişi</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+        <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+        <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+        <a href="category.html?cat=İdman">🏃 İdman</a>
+        <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+        <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+        <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+        <a href="category.html?cat=Baxım">💄 Baxım</a>
+        <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+        <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+        <a href="category.html?cat=Digər">📦 Digər</a>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-section-label">✨ Xüsusi</div>
+    <a href="auction.html">🔨 Auksiyon</a>
+    <a href="swipe.html">💫 Kəşf et</a>
+    <a href="feed.html">📱 Feed</a>
+  </div>
+</div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html" title="Sevimlilər" style="color:var(--olive);border-color:var(--olive);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </a>
+  </div>
+</nav>
+
+<div class="cat-nav">
+  
+  <a class="cat-item" href="category.html">Hamısı</a>
+  <a class="cat-item" href="category.html?cat=Qadın">Qadın</a>
+  <a class="cat-item" href="category.html?cat=Kişi">Kişi</a>
+  <a class="cat-item" href="category.html?cat=Dizayner">Brendlər</a>
+  <a class="cat-item" href="category.html?cat=Uşaq">Uşaq</a>
+  <a class="cat-item" href="category.html?cat=Ayaqqabı">Ayaqqabı</a>
+  <a class="cat-item" href="category.html?cat=İdman">İdman</a>
+  <a class="cat-item" href="category.html?cat=Aksessuar">Aksessuar</a>
+  <a class="cat-item" href="category.html?cat=Xüsusi gün geyimi">Xüsusi gün geyimi</a>
+  <a class="cat-item" href="category.html?cat=Çantalar">Çantalar</a>
+   <a class="cat-item" href="category.html?cat=Baxım">Baxım</a>
+<a class="cat-item" href="category.html?cat=Ev əşyaları">Ev əşyaları</a>
+<a class="cat-item" href="category.html?cat=Parfüm">Parfüm</a>
+<a class="cat-item" href="category.html?cat=Digər">Digər</a>
+</div>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <div>
+      <h1 class="page-title">❤️ Sevimlilər</h1>
+      <p class="fav-count" id="favCount">Yüklənir...</p>
+    </div>
+    <a class="btn-browse" href="category.html">Məhsullara bax</a>
+  </div>
+</div>
+
+<div class="page-content">
+  <div class="grid" id="favGrid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+async function loadFavorites() {
+  const grid = document.getElementById('favGrid');
+  const countEl = document.getElementById('favCount');
+
+  const user = await getCurrentUser();
+  if (!user) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-icon">🔒</div>
+        <h3>Giriş edin</h3>
+        <p>Sevimlilərini görmək üçün hesabınıza daxil olun.</p>
+        <a class="btn-browse" href="login.html">Giriş et</a>
+      </div>`;
+    countEl.textContent = '';
+    return;
+  }
+
+  // Əvvəlcə product_id-ləri al
+  const { data: favIds } = await db
+    .from('favorites')
+    .select('product_id')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (!favIds || favIds.length === 0) {
+    // boş state göstər
+    grid.innerHTML = `...`;
+    countEl.textContent = '0 məhsul';
+    return;
+  }
+
+  const ids = favIds.map(f => f.product_id);
+ const { data: favs, error } = await db
+    .from('products_with_seller')
+    .select('*')
+    .in('id', ids);
+
+  if (error || !favs || favs.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-icon">🤍</div>
+        <h3>Hələ sevimli yoxdur</h3>
+        <p>Bəyəndiyiniz məhsulların üzərindəki ❤️ düyməsinə basın.</p>
+        <a class="btn-browse" href="category.html">Məhsullara bax</a>
+      </div>`;
+    countEl.textContent = '0 məhsul';
+    return;
+  }
+
+  countEl.textContent = favs.length + ' məhsul';
+  grid.innerHTML = favs
+    .map(p => createProductCard(p))
+    .join('');
+}
+
+updateNavAuth();
+loadFavorites();
+loadUserFavorites();
+</script>
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+</body>
+</html>

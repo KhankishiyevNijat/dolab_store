@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Məhsul — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .breadcrumb { max-width:1160px; margin:0 auto; padding:18px 2rem 0; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); }
+    .breadcrumb a { color:var(--muted); text-decoration:none; } .breadcrumb a:hover { color:var(--olive); }
+    .product-page { max-width:1160px; margin:0 auto; padding:28px 2rem 64px; display:grid; grid-template-columns:1fr 420px; gap:48px; align-items:start; }
+    .gallery { display:flex; flex-direction:column; gap:12px; position:sticky; top:84px; }
+    .gallery-main { width:100%; aspect-ratio:3/4; border-radius:16px; border:1px solid var(--border); overflow:hidden; position:relative; background:var(--cream2); display:flex; align-items:center; justify-content:center; font-size:80px; }
+    .gallery-main img { width:100%; height:100%; object-fit:cover; object-position:top; }
+    .gallery-fav { position:absolute; top:16px; right:16px; width:40px; height:40px; border-radius:50%; background:white; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; z-index:2; }
+    .gallery-thumbs { display:flex; gap:10px; overflow-x:auto; }
+    .thumb { width:72px; height:90px; border-radius:10px; border:1.5px solid var(--border); overflow:hidden; cursor:pointer; flex-shrink:0; transition:border-color 0.18s; }
+    .thumb img { width:100%; height:100%; object-fit:cover; object-position:top; }
+    .thumb.active { border-color:var(--olive); }
+    .product-info { display:flex; flex-direction:column; gap:20px; }
+    .product-brand { font-size:12px; font-weight:500; color:var(--olive); text-transform:uppercase; letter-spacing:0.08em; }
+    .product-title { font-size:38px; color:var(--navy); line-height:1.1; margin:4px 0; }
+    .product-price-row { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+    .product-price { font-family:'Amatic SC',cursive; font-size:40px; font-weight:700; color:var(--olive); }
+    .product-price-old { font-size:18px; color:var(--muted); text-decoration:line-through; }
+    .product-saving { font-size:13px; background:#fff0f0; color:#d94f4f; padding:3px 10px; border-radius:20px; }
+    .divider { border:none; border-top:1px solid var(--border); }
+    .details-table { display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; }
+    .detail-label { font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:4px; }
+    .detail-value { font-size:14px; color:var(--navy); font-weight:400; }
+    .condition-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:13px; background:#f0faf0; color:var(--olive); border:1px solid rgba(107,124,74,0.2); }
+    .btn-buy { width:100%; font-family:inherit; font-size:16px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:10px; padding:15px 20px; cursor:pointer; transition:background 0.18s; }
+    .btn-buy:hover { background:var(--olive-dark); }
+    .btn-message { width:100%; font-family:inherit; font-size:16px; font-weight:300; color:var(--navy); background:transparent; border:1.5px solid var(--border); border-radius:10px; padding:14px 20px; cursor:pointer; transition:border-color 0.18s; }
+    .btn-message:hover { border-color:var(--navy); }
+    .seller-card { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:20px; display:flex; align-items:center; gap:14px; text-decoration:none; transition:border-color 0.18s; }
+    .seller-card:hover { border-color:var(--olive); }
+    .seller-avatar { width:48px; height:48px; border-radius:50%; overflow:hidden; border:1px solid var(--border); flex-shrink:0; background:var(--cream2); display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .seller-avatar img { width:100%; height:100%; object-fit:cover; }
+    .seller-name { font-size:15px; font-weight:400; color:var(--navy); margin-bottom:3px; }
+    .seller-meta { font-size:12px; color:var(--muted); }
+    .seller-arrow { margin-left:auto; color:var(--muted); }
+    .product-desc { font-size:14px; color:var(--muted); line-height:1.7; }
+    .trust-badges { display:flex; flex-direction:column; gap:10px; }
+    .trust-item { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--muted); }
+    .trust-icon { width:32px; height:32px; background:var(--cream2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .similar-section { max-width:1160px; margin:0 auto; padding:0 2rem 64px; }
+    .sold-badge { background:#d94f4f; color:white; font-size:13px; padding:6px 16px; border-radius:20px; display:inline-block; }
+    .owner-actions { display:flex; gap:10px; }
+    .btn-edit { flex:1; font-family:inherit; font-size:14px; font-weight:300; color:var(--navy); background:transparent; border:1.5px solid var(--border); border-radius:10px; padding:12px; cursor:pointer; transition:border-color 0.18s; }
+    .btn-edit:hover { border-color:var(--navy); }
+    .btn-delete { flex:1; font-family:inherit; font-size:14px; font-weight:300; color:#d94f4f; background:transparent; border:1.5px solid rgba(217,79,79,0.3); border-radius:10px; padding:12px; cursor:pointer; transition:all 0.18s; }
+    .btn-delete:hover { background:#fff0f0; border-color:#d94f4f; }
+    .skeleton-block { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:8px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .msg-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    .msg-modal.open { display:flex; }
+    .msg-box { background:var(--white); border-radius:16px; padding:28px; width:100%; max-width:480px; box-shadow:0 16px 48px rgba(0,0,0,0.15); }
+    .msg-box h3 { font-size:26px; color:var(--navy); margin-bottom:6px; }
+    .msg-box p { font-size:13.5px; color:var(--muted); margin-bottom:20px; }
+    .msg-textarea { width:100%; font-family:inherit; font-size:14px; font-weight:300; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:14px; outline:none; resize:vertical; min-height:120px; box-sizing:border-box; transition:border-color 0.18s; }
+    .msg-textarea:focus { border-color:var(--olive); background:var(--white); }
+    .msg-actions { display:flex; gap:10px; margin-top:16px; }
+    .msg-send { flex:1; font-family:inherit; font-size:15px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:10px; padding:13px; cursor:pointer; transition:background 0.18s; }
+    .msg-send:hover { background:var(--olive-dark); }
+    .msg-send:disabled { opacity:0.6; cursor:not-allowed; }
+    .msg-cancel { font-family:inherit; font-size:14px; font-weight:300; color:var(--muted); background:none; border:1.5px solid var(--border); border-radius:10px; padding:13px 20px; cursor:pointer; }
+    /* SHARE */
+    .share-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1001; align-items:flex-end; justify-content:center; }
+    .share-modal.open { display:flex; }
+    .share-sheet { background:var(--white); border-radius:20px 20px 0 0; width:100%; max-width:560px; padding:20px 20px 32px; box-shadow:0 -8px 40px rgba(0,0,0,0.15); }
+    .share-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px; }
+    .share-sheet h3 { font-size:22px; color:var(--navy); margin-bottom:16px; text-align:center; }
+    .share-options { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+    .share-opt { display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; }
+    .share-opt-icon { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; border:1.5px solid var(--border); background:var(--cream2); transition:transform 0.15s; }
+    .share-opt-icon:hover { transform:scale(1.08); }
+    .share-opt span { font-size:11px; color:var(--muted); text-align:center; }
+    .share-copy-row { display:flex; gap:8px; background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:10px 14px; align-items:center; }
+    .share-copy-url { flex:1; font-size:12.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .share-copy-btn { font-family:inherit; font-size:13px; color:var(--olive); background:none; border:none; cursor:pointer; white-space:nowrap; font-weight:400; }
+    .share-copy-btn.copied { color:#2ecc71; }
+    /* Share button */
+    .btn-share { width:100%; font-family:inherit; font-size:15px; font-weight:300; color:var(--navy); background:transparent; border:1.5px solid var(--border); border-radius:10px; padding:13px 20px; cursor:pointer; transition:border-color 0.18s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-share:hover { border-color:var(--navy); }
+
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+  <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="catalog-dropdown">
+    <div class="dropdown-sub">
+      <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+        🛍️ Məhsullar
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="dropdown-sub-menu">
+        <a href="category.html">Hamısı</a>
+        <a href="category.html?cat=Qadın">👗 Qadın</a>
+        <a href="category.html?cat=Kişi">👔 Kişi</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+        <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+        <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+        <a href="category.html?cat=İdman">🏃 İdman</a>
+        <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+        <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+        <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+        <a href="category.html?cat=Baxım">💄 Baxım</a>
+        <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+        <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+        <a href="category.html?cat=Digər">📦 Digər</a>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-section-label">✨ Xüsusi</div>
+    <a href="auction.html">🔨 Auksiyon</a>
+    <a href="swipe.html">💫 Kəşf et</a>
+    <a href="feed.html">📱 Feed</a>
+  </div>
+</div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="#"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<div class="breadcrumb" id="breadcrumb">
+  <a href="index.html">Ana səhifə</a> › <span>Yüklənir...</span>
+</div>
+
+<div class="product-page" id="productPage">
+  <!-- Loaded by JS -->
+  <div class="gallery">
+    <div class="gallery-main skeleton-block" style="aspect-ratio:3/4;"></div>
+  </div>
+  <div class="product-info">
+    <div class="skeleton-block" style="height:32px;width:60%;"></div>
+    <div class="skeleton-block" style="height:48px;width:80%;margin-top:8px;"></div>
+    <div class="skeleton-block" style="height:24px;width:40%;margin-top:8px;"></div>
+  </div>
+</div>
+
+<div class="similar-section" id="similarSection" style="display:none;">
+  <div class="section-header">
+    <h2 class="section-title">Bənzər məhsullar</h2>
+    <a class="section-link" href="category.html">Hamısına bax →</a>
+  </div>
+  <div class="grid" id="similarGrid"></div>
+</div>
+
+
+<!-- MESAJ MODAL -->
+<div class="msg-modal" id="msgModal">
+  <div class="msg-box">
+    <h3>Satıcıya mesaj</h3>
+    <p id="msgSellerName">Satıcıya sual verin...</p>
+    <textarea class="msg-textarea" id="msgText" placeholder="Məsələn: Bu məhsul hələ satışdadır? Çatdırılma mümkündür?"></textarea>
+    <div class="msg-actions">
+      <button class="msg-cancel" onclick="closeMsgModal()">Ləğv et</button>
+      <button class="msg-send" id="msgSendBtn" onclick="sendMessage()">Göndər →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- SHARE MODAL -->
+<div class="share-modal" id="shareModal">
+  <div class="share-sheet">
+    <div class="share-handle"></div>
+    <h3>Paylaş</h3>
+    <div class="share-options">
+      <div class="share-opt" onclick="shareVia('whatsapp')">
+        <div class="share-opt-icon" style="background:#d9f7e7;border-color:#25d366;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <span>WhatsApp</span>
+      </div>
+      <div class="share-opt" onclick="shareVia('telegram')">
+        <div class="share-opt-icon" style="background:#e3f2fd;border-color:#0088cc;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#0088cc"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        </div>
+        <span>Telegram</span>
+      </div>
+      <div class="share-opt" onclick="shareVia('instagram')">
+        <div class="share-opt-icon" style="background:#fce4ec;border-color:#e1306c;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#e1306c"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        </div>
+        <span>Instagram</span>
+      </div>
+      <div class="share-opt" onclick="shareVia('native')">
+        <div class="share-opt-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <span>Digər</span>
+      </div>
+    </div>
+    <div class="share-copy-row">
+      <span class="share-copy-url" id="shareCopyUrl"></span>
+      <button class="share-copy-btn" id="shareCopyBtn" onclick="copyLink()">Kopyala</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="sell.html">Necə satmalı</a>
+        <a href="#">Tariflər</a>
+        <a href="#">Çatdırılma</a>
+        <a href="#">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+        <a href="privacy.html">İstifadəçi şərtləri</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+const productId = new URLSearchParams(window.location.search).get('id');
+if (!productId) location.href = 'index.html';
+
+async function loadProduct() {
+  const [{ data: product }, currentUser] = await Promise.all([
+    db.from('products_with_seller').select('*').eq('id', productId).single(),
+    getCurrentUser()
+  ]);
+
+  if (!product) { location.href = 'index.html'; return; }
+
+  document.title = product.title + ' — Dolab.az';
+
+  // Increment views
+  db.from('products').update({ views: (product.views || 0) + 1 }).eq('id', productId);
+
+  const isOwner = currentUser && currentUser.id === product.seller_id;
+  const discount = product.old_price ? Math.round((1 - product.price / product.old_price) * 100) : null;
+
+  // Breadcrumb
+  document.getElementById('breadcrumb').innerHTML = `
+    <a href="index.html">Ana səhifə</a> ›
+    <a href="category.html?cat=${product.category_name || ''}">${product.category_name || 'Kateqoriya'}</a> ›
+    <span>${product.title}</span>
+  `;
+
+  // Build images
+  const images = product.images && product.images.length > 0 ? product.images : [];
+  const mainImgHtml = images.length > 0
+    ? `<img id="mainImg" src="${getProductImageUrl(images[0])}" alt="${product.title}">`
+    : `<span>📦</span>`;
+
+  const thumbsHtml = images.map((img, i) => `
+    <div class="thumb ${i===0?'active':''}" onclick="switchImg(this,'${getProductImageUrl(img)}')">
+      <img src="${getProductImageUrl(img)}" alt="">
+    </div>
+  `).join('');
+
+  // Check if favorited
+  let isFav = false;
+  if (currentUser) {
+    const { data: fav } = await db.from('favorites').select('id')
+      .eq('user_id', currentUser.id).eq('product_id', productId).single();
+    isFav = !!fav;
+  }
+
+  document.getElementById('productPage').innerHTML = `
+    <div class="gallery">
+      <div class="gallery-main">
+        ${mainImgHtml}
+        <div class="gallery-fav" id="favBtn" onclick="toggleFavProduct()">${isFav ? '❤️' : '🤍'}</div>
+      </div>
+      ${images.length > 1 ? `<div class="gallery-thumbs">${thumbsHtml}</div>` : ''}
+    </div>
+
+    <div class="product-info">
+      <div>
+        <div class="product-brand">${product.brand || ''}</div>
+        <h1 class="product-title">${product.title}</h1>
+        ${product.is_sold ? '<span class="sold-badge">Satıldı</span>' : ''}
+      </div>
+
+      <div class="product-price-row">
+        <span class="product-price">${formatPrice(product.price)}</span>
+        ${product.old_price ? `<span class="product-price-old">${formatPrice(product.old_price)}</span>` : ''}
+        ${discount ? `<span class="product-saving">${discount}% endirim</span>` : ''}
+      </div>
+
+      <hr class="divider">
+
+      <div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Vəziyyət</p>
+        <span class="condition-badge">${conditionLabels[product.condition] || product.condition || '—'}</span>
+      </div>
+
+      <div class="details-table">
+        <div><div class="detail-label">Ölçü</div><div class="detail-value">${product.size || '—'}</div></div>
+        <div><div class="detail-label">Brend</div><div class="detail-value">${product.brand || '—'}</div></div>
+        <div><div class="detail-label">Rəng</div><div class="detail-value">${product.color || '—'}</div></div>
+        <div><div class="detail-label">Kateqoriya</div><div class="detail-value">${product.category_name || '—'}</div></div>
+        <div><div class="detail-label">Məkan</div><div class="detail-value">${product.location || 'Bakı'}</div></div>
+        <div><div class="detail-label">Əlavə edilib</div><div class="detail-value">${new Date(product.created_at).toLocaleDateString('en-GB')}</div></div>
+      </div>
+
+      <hr class="divider">
+
+      ${isOwner ? `
+        <div class="owner-actions">
+          <button class="btn-edit" onclick="markAsSold()">
+            ${product.is_sold ? '✅ Satışa çıxar' : '📦 Satıldı kimi işarələ'}
+          </button>
+          <button class="btn-delete" onclick="deleteProduct()">🗑️ Sil</button>
+        </div>
+      ` : `
+        ${!product.is_sold ? `<button class="btn-buy" onclick="contactSeller()">Satın al — ${formatPrice(product.price)}</button>` : ''}
+        <button class="btn-message" onclick="contactSeller()">💬 Satıcıya mesaj göndər</button>
+      `}
+
+      <hr class="divider">
+
+      <a class="seller-card" href="profile.html?id=${product.seller_id}">
+        <div class="seller-avatar">
+          ${product.seller_avatar
+            ? `<img src="${product.seller_avatar}" alt="${product.seller_name}">`
+            : '👤'
+          }
+        </div>
+        <div>
+          <div class="seller-name">${product.seller_name || 'İstifadəçi'}</div>
+          <div class="seller-meta">
+            ${product.seller_rating ? '⭐ ' + product.seller_rating + ' · ' : ''}
+            ${product.seller_sales || 0} satış ·
+            ${product.seller_location || 'Bakı'}
+          </div>
+        </div>
+        <svg class="seller-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
+      ${product.description ? `
+        <div>
+          <h3 style="font-size:20px;margin-bottom:10px;color:var(--navy);">Təsvir</h3>
+          <p class="product-desc">${product.description}</p>
+        </div>
+      ` : ''}
+
+      <button class="btn-share" onclick="openShareModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Paylaş
+      </button>
+
+      <div class="trust-badges">
+        <div class="trust-item"><div class="trust-icon">🔒</div><span>Dolab.az vasitəsilə təhlükəsiz ödəniş</span></div>
+        <div class="trust-item"><div class="trust-icon">↩️</div><span>Məhsul gözlənildiyi kimi deyilsə, pulunuzu geri alırsınız</span></div>
+        <div class="trust-item"><div class="trust-icon">📦</div><span>Bakı daxili: 1-2 iş günü çatdırılma</span></div>
+      </div>
+    </div>
+  `;
+
+  // Seller məlumatlarını yadda saxla (mesaj üçün)
+  currentSellerId = product.seller_id;
+  currentSellerName = product.seller_name;
+  if (document.getElementById('msgSellerName')) {
+    document.getElementById('msgSellerName').textContent = 
+      `${product.seller_name || 'Satıcı'} ilə əlaqə saxlayın`;
+  }
+
+  // Load similar
+  loadSimilar(product.category_id, productId);
+}
+
+async function loadSimilar(categoryId, excludeId) {
+  if (!categoryId) return;
+  const { data } = await db.from('products_with_seller')
+    .select('*')
+    .eq('category_id', categoryId)
+    .neq('id', excludeId)
+    .limit(4);
+
+  if (!data || data.length === 0) return;
+  document.getElementById('similarSection').style.display = 'block';
+  document.getElementById('similarGrid').innerHTML = data.map(createProductCard).join('');
+}
+
+function switchImg(thumb, url) {
+  document.getElementById('mainImg').src = url;
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+
+async function toggleFavProduct() {
+  const btn = document.getElementById('favBtn');
+  const user = await getCurrentUser();
+  if (!user) { location.href = 'login.html'; return; }
+
+  const { data: existing } = await db.from('favorites').select('id')
+    .eq('user_id', user.id).eq('product_id', productId).single();
+
+  if (existing) {
+    await db.from('favorites').delete().eq('id', existing.id);
+    btn.textContent = '🤍';
+  } else {
+    await db.from('favorites').insert({ user_id: user.id, product_id: productId });
+    btn.textContent = '❤️';
+  }
+}
+
+async function markAsSold() {
+  const { data: product } = await db.from('products').select('is_sold').eq('id', productId).single();
+  await db.from('products').update({ is_sold: !product.is_sold }).eq('id', productId);
+  location.reload();
+}
+
+async function deleteProduct() {
+  if (!confirm('Məhsulu silmək istədiyinizə əminsiniz?')) return;
+  const { error } = await db.from('products').update({ is_active: false }).eq('id', productId);
+  if (error) { alert('Xəta: ' + error.message); return; }
+  location.href = 'profile.html';
+}
+
+let currentSellerId = null;
+let currentSellerName = null;
+
+function contactSeller() {
+  getCurrentUser().then(user => {
+    if (!user) { location.href = 'login.html'; return; }
+    document.getElementById('msgModal').classList.add('open');
+    document.getElementById('msgText').value = '';
+    document.getElementById('msgSendBtn').disabled = false;
+    document.getElementById('msgSendBtn').textContent = 'Göndər →';
+  });
+}
+
+function closeMsgModal() {
+  document.getElementById('msgModal').classList.remove('open');
+}
+
+async function sendMessage() {
+  const text = document.getElementById('msgText').value.trim();
+  if (!text) { document.getElementById('msgText').focus(); return; }
+
+  const user = await getCurrentUser();
+  if (!user) { location.href = 'login.html'; return; }
+
+  const btn = document.getElementById('msgSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Göndərilir...';
+
+  const { error } = await db.from('messages').insert({
+    product_id: productId,
+    sender_id: user.id,
+    receiver_id: currentSellerId,
+    content: text
+  });
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Göndər →';
+    alert('Xəta baş verdi. Yenidən cəhd edin.');
+  } else {
+    btn.textContent = '✓ Göndərildi!';
+    setTimeout(() => closeMsgModal(), 1500);
+  }
+}
+
+
+function openShareModal() {
+  const url = window.location.href;
+  document.getElementById('shareCopyUrl').textContent = url;
+  document.getElementById('shareModal').classList.add('open');
+}
+
+function closeShareModal() {
+  document.getElementById('shareModal').classList.remove('open');
+}
+
+function copyLink() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('shareCopyBtn');
+    btn.textContent = '✓ Kopyalandı';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopyala'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function shareVia(platform) {
+  const url = encodeURIComponent(window.location.href);
+  const title = encodeURIComponent(document.title);
+  let link = '';
+  if (platform === 'whatsapp') link = `https://wa.me/?text=${title}%20${url}`;
+  else if (platform === 'telegram') link = `https://t.me/share/url?url=${url}&text=${title}`;
+  else if (platform === 'instagram') {
+    copyLink();
+    alert('Link kopyalandı! Instagram-da paylaşmaq üçün yapışdırın.');
+    return;
+  } else if (platform === 'native') {
+    if (navigator.share) {
+      navigator.share({ title: document.title, url: window.location.href });
+    } else { copyLink(); }
+    return;
+  }
+  window.open(link, '_blank');
+  closeShareModal();
+}
+
+document.getElementById('shareModal').addEventListener('click', function(e) {
+  if (e.target === this) closeShareModal();
+});
+
+document.getElementById('msgModal').addEventListener('click', function(e) {
+  if (e.target === this) closeMsgModal();
+});
+
+updateNavAuth();
+loadProduct();
+
+</script>
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<style>
+    @media (max-width: 768px) {
+      .breadcrumb { padding: 10px 12px 0; font-size: 12px; }
+      .product-page { grid-template-columns: 1fr; padding: 14px 12px 80px; gap: 20px; }
+      .gallery { position: static; }
+      .gallery-main { aspect-ratio: 1/1; border-radius: 10px; }
+      .product-title { font-size: 26px; }
+      .product-price { font-size: 30px; }
+      .product-price-old { font-size: 14px; }
+      .details-table { gap: 10px 12px; }
+      .similar-section { padding: 0 12px 80px; }
+    }
+</style>
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+
+</body>
+</html>

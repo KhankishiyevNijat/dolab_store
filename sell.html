@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Məhsul yerləşdir — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .nav-title { font-family:'Amatic SC',cursive; font-size:22px; color:var(--navy); }
+    .btn-cancel { font-family:inherit; font-size:13.5px; font-weight:300; color:var(--muted); background:none; border:1.5px solid var(--border); border-radius:8px; padding:8px 16px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; transition:border-color 0.18s; }
+    .btn-cancel:hover { border-color:var(--navy); color:var(--navy); }
+    .btn-publish-nav { font-family:inherit; font-size:14px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:8px; padding:10px 26px; cursor:pointer; transition:background 0.18s; }
+    .btn-publish-nav:hover { background:var(--olive-dark); }
+    .btn-publish-nav:disabled { opacity:0.6; cursor:not-allowed; }
+
+    .sell-page { max-width:900px; margin:0 auto; padding:40px 2rem 80px; display:grid; grid-template-columns:1fr 300px; gap:32px; align-items:start; }
+    .form-section { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:28px 32px; margin-bottom:20px; }
+    .form-section-title { font-size:24px; color:var(--navy); margin-bottom:22px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+    .form-group { margin-bottom:20px; }
+    .form-group:last-child { margin-bottom:0; }
+    .form-label { display:block; font-size:13px; font-weight:400; color:var(--navy); margin-bottom:8px; }
+    .form-label .req { color:#d94f4f; margin-left:3px; }
+    .form-label .hint { font-size:12px; color:var(--muted); font-weight:300; margin-left:6px; }
+    .form-input { width:100%; font-family:inherit; font-size:14px; font-weight:300; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:9px; padding:12px 14px; outline:none; transition:border-color 0.18s,background 0.18s; }
+    .form-input:focus { border-color:var(--olive); background:var(--white); box-shadow:0 0 0 3px rgba(107,124,74,0.08); }
+    .form-input::placeholder { color:var(--muted); }
+    textarea.form-input { resize:vertical; min-height:110px; line-height:1.6; }
+    select.form-input { cursor:pointer; }
+    .char-count { font-size:11.5px; color:var(--muted); text-align:right; margin-top:5px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+    /* PHOTO UPLOAD */
+    .photo-upload-area { border:2px dashed var(--border); border-radius:14px; padding:32px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--cream2); margin-bottom:16px; }
+    .photo-upload-area:hover { border-color:var(--olive); background:rgba(107,124,74,0.04); }
+    .upload-icon { font-size:40px; margin-bottom:12px; }
+    .upload-title { font-size:16px; font-weight:400; color:var(--navy); margin-bottom:6px; }
+    .upload-hint { font-size:13px; color:var(--muted); }
+    .upload-hint span { color:var(--olive); }
+    .photo-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
+    .photo-preview { aspect-ratio:3/4; border-radius:10px; overflow:hidden; position:relative; border:1px solid var(--border); background:var(--cream2); }
+    .photo-preview img { width:100%; height:100%; object-fit:cover; }
+    .photo-preview .remove-btn { position:absolute; top:6px; right:6px; width:22px; height:22px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .photo-preview .main-label { position:absolute; bottom:6px; left:6px; background:var(--olive); color:white; font-size:10px; padding:2px 8px; border-radius:10px; }
+    input[type="file"] { display:none; }
+
+    /* SIZE PILLS */
+    .size-pills { display:flex; flex-wrap:wrap; gap:8px; }
+    .size-pill { padding:8px 16px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:13.5px; color:var(--navy); background:none; cursor:pointer; transition:all 0.15s; }
+    .size-pill:hover { border-color:var(--olive); }
+    .size-pill.active { border-color:var(--olive); background:var(--olive); color:white; }
+
+    /* CONDITION */
+    .condition-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .condition-card { padding:14px 16px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.18s; }
+    .condition-card:hover { border-color:var(--olive); }
+    .condition-card.active { border-color:var(--olive); background:rgba(107,124,74,0.04); }
+    .condition-title { font-size:14px; font-weight:400; color:var(--navy); margin-bottom:3px; }
+    .condition-desc { font-size:12px; color:var(--muted); }
+
+    /* PRICE */
+    .price-preview { background:var(--cream2); border-radius:10px; padding:16px; margin-top:16px; }
+    .price-row { display:flex; justify-content:space-between; align-items:center; font-size:13.5px; color:var(--muted); padding:5px 0; }
+    .price-row.total { border-top:1px solid var(--border); padding-top:10px; margin-top:5px; font-size:15px; color:var(--navy); font-weight:400; }
+    .price-row.total .amount { font-family:'Amatic SC',cursive; font-size:24px; color:var(--olive); font-weight:700; }
+
+    /* SIDEBAR */
+    .tips-card { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:20px; }
+    .tips-card h3 { font-size:22px; color:var(--navy); margin-bottom:16px; }
+    .tip-item { display:flex; gap:12px; margin-bottom:14px; }
+    .tip-icon { font-size:20px; flex-shrink:0; }
+    .tip-text { font-size:13px; color:var(--muted); line-height:1.6; }
+    .tip-text strong { color:var(--navy); font-weight:400; }
+    .publish-card { background:var(--navy); border-radius:16px; padding:24px; }
+    .publish-card h3 { font-size:22px; color:white; margin-bottom:8px; }
+    .publish-card p { font-size:13px; color:rgba(255,255,255,0.65); margin-bottom:20px; line-height:1.6; }
+    .btn-publish-big { width:100%; font-family:inherit; font-size:16px; font-weight:400; color:var(--navy); background:var(--white); border:none; border-radius:10px; padding:14px; cursor:pointer; transition:background 0.18s; }
+    .btn-publish-big:hover { background:var(--cream); }
+    .btn-publish-big:disabled { opacity:0.6; cursor:not-allowed; }
+
+    .alert { padding:12px 16px; border-radius:10px; font-size:13.5px; margin-bottom:16px; }
+    .alert-error { background:#fff0f0; color:#d94f4f; }
+    .alert-warning { background:#fffbea; color:#856000; }
+    .upload-progress { height:4px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden; display:none; }
+    .upload-progress-bar { height:100%; background:var(--olive); transition:width 0.3s; width:0%; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <span class="nav-title">Məhsul yerləşdir</span>
+  <div class="nav-right">
+    <a class="btn-cancel" href="index.html">Ləğv et</a>
+    <button class="btn-publish-nav" id="publishNavBtn" onclick="publishProduct()">Yerləşdir</button>
+  </div>
+</nav>
+
+<!-- NOT APPROVED WARNING -->
+<div id="notApprovedAlert" style="display:none; padding:16px 2.5rem; background:#fffbea; border-bottom:1px solid #f0e080;">
+  <div style="max-width:900px; margin:0 auto; font-size:14px; color:#856000;">
+    ⚠️ Hesabınız hələ admin tərəfindən təsdiqlənməyib. Təsdiqləndikdən sonra məhsul yerləşdirə biləcəksiniz.
+    Suallarınız üçün: <a href="elaqe.html" style="color:var(--olive);">bizimlə əlaqə</a>
+  </div>
+</div>
+
+<div class="sell-page">
+  <div id="formContent">
+
+    <!-- PHOTOS -->
+    <div class="form-section">
+      <h2 class="form-section-title">📸 Fotolar</h2>
+      <input type="file" id="fileInput" multiple accept="image/*" onchange="handleFiles(this.files)">
+      <div class="photo-upload-area" onclick="document.getElementById('fileInput').click()" id="uploadArea">
+        <div class="upload-icon">📷</div>
+        <div class="upload-title">Foto yüklə</div>
+        <p class="upload-hint">Klikləyin · <span>JPG, PNG</span> · Maks. 8 foto</p>
+      </div>
+      <div class="upload-progress" id="uploadProgress">
+        <div class="upload-progress-bar" id="uploadProgressBar"></div>
+      </div>
+      <div class="photo-grid" id="photoGrid"></div>
+      <p style="font-size:12px;color:var(--muted);margin-top:10px;">İlk foto əsas foto kimi göstəriləcək. Ən azı 1 foto əlavə edin.</p>
+    </div>
+
+    <!-- BASIC INFO -->
+    <div class="form-section">
+      <h2 class="form-section-title">📋 Əsas məlumatlar</h2>
+      <div class="form-group">
+        <label class="form-label">Başlıq <span class="req">*</span></label>
+        <input class="form-input" type="text" id="title" placeholder="Məs: Zara çiçəkli midi paltar, S ölçü" maxlength="80" oninput="document.getElementById('titleCount').textContent=this.value.length">
+        <div class="char-count"><span id="titleCount">0</span> / 80</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Brend <span class="req">*</span></label>
+        <input class="form-input" type="text" id="brand" placeholder="Məs: Zara, H&M, Nike...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Kateqoriya <span class="req">*</span></label>
+          <select class="form-input" id="category">
+            <option value="">Seçin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rəng</label>
+          <input class="form-input" type="text" id="color" list="color-list" placeholder="Məs: Qara, Göy, Rəngarəng...">
+          <datalist id="color-list">
+            <option>Ağ</option>
+            <option>Qara</option>
+            <option>Bej / Krem</option>
+            <option>Göy</option>
+            <option>Yaşıl / Zeytun</option>
+            <option>Qırmızı</option>
+            <option>Çəhrayı</option>
+            <option>Boz</option>
+            <option>Rəngarəng / Naxışlı</option>
+            <option>Qəhvəyi</option>
+            <option>Narıncı</option>
+            <option>Sarı</option>
+            <option>Bənövşəyi</option>
+          </datalist>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ölçü <span class="req">*</span></label>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">👗 Paltar ölçüsü</p>
+        <div class="size-pills" style="margin-bottom:12px;">
+          <button type="button" class="size-pill" onclick="selectSize(this)">XS</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">S</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">M</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">L</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">XL</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">XXL</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">One size</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">👟 Ayaqqabı ölçüsü</p>
+        <div class="size-pills" style="margin-bottom:12px;">
+          <button type="button" class="size-pill" onclick="selectSize(this)">36</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">37</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">38</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">39</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">40</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">41</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">42</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">43</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">44</button>
+          <button type="button" class="size-pill" onclick="selectSize(this)">45</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px;">✏️ Yuxarıda yoxdursa özün yaz</p>
+        <input class="form-input" type="text" id="sizeManual" placeholder="Məs: 38-40, 128cm, 6-7 yaş...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vəziyyət <span class="req">*</span></label>
+        <div class="condition-grid">
+          <div class="condition-card active" onclick="selectCondition(this,'new_with_tags')"><div class="condition-title">✨ Yeni, etiketle</div><div class="condition-desc">Heç geyilməyib</div></div>
+          <div class="condition-card" onclick="selectCondition(this,'excellent')"><div class="condition-title">⭐ Əla vəziyyət</div><div class="condition-desc">1-2 dəfə geyinilib</div></div>
+          <div class="condition-card" onclick="selectCondition(this,'good')"><div class="condition-title">👍 Yaxşı vəziyyət</div><div class="condition-desc">Müntəzəm istifadə</div></div>
+          <div class="condition-card" onclick="selectCondition(this,'fair')"><div class="condition-title">✔️ Kafi vəziyyət</div><div class="condition-desc">Köhnəlmə izləri var</div></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Məhsul haqqında <span class="hint">(tövsiyə olunur)</span></label>
+        <textarea class="form-input" id="description" placeholder="Materialı, istifadə tarixi, çatdırılma şərtləri..." oninput="document.getElementById('descCount').textContent=this.value.length" maxlength="500"></textarea>
+        <div class="char-count"><span id="descCount">0</span> / 500</div>
+      </div>
+    </div>
+
+    <!-- PRICE -->
+    <div class="form-section">
+      <h2 class="form-section-title">💰 Qiymət</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Satış qiyməti (₼) <span class="req">*</span></label>
+          <input class="form-input" type="number" id="price" placeholder="0" min="1" oninput="updatePricePreview()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Orijinal qiymət (₼) <span class="hint">(könüllü)</span></label>
+          <input class="form-input" type="number" id="oldPrice" placeholder="0" min="1" oninput="updatePricePreview()">
+        </div>
+      </div>
+      <div class="price-preview">
+        <div class="price-row"><span>Satış qiyməti</span><span id="priceDisplay">₼0</span></div>
+        <div class="price-row" id="discountRow" style="display:none;color:#d94f4f;"><span>Endirim</span><span id="discountDisplay"></span></div>
+        <div class="price-row"><span>Platforma komissiyası</span><span style="color:var(--olive);">₼0 — pulsuz!</span></div>
+        <div class="price-row total"><span>Sizə çatacaq</span><span class="amount" id="earningsDisplay">₼0</span></div>
+      </div>
+    </div>
+
+    <!-- SHIPPING -->
+    <div class="form-section">
+      <h2 class="form-section-title">📦 Çatdırılma</h2>
+      <div class="form-group">
+        <label class="form-label">Çatdırılma üsulu</label>
+        <select class="form-input" id="delivery">
+          <option>Şəxsi görüş (Bakı daxili)</option>
+          <option>Kuryer vasitəsilə (+₼3)</option>
+          <option>Poçt göndərişi</option>
+          <option>Bütün üsullar mümkündür</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Məkan</label>
+        <input class="form-input" type="text" id="location" list="location-list" placeholder="Məsələn: Bakı — Nəsimi">
+        <datalist id="location-list">
+          <option>Bakı — Nəsimi</option>
+          <option>Bakı — Yasamal</option>
+          <option>Bakı — Sabunçu</option>
+          <option>Bakı — Binəqədi</option>
+          <option>Bakı — Xəzər</option>
+          <option>Bakı — Suraxanı</option>
+          <option>Bakı — Xətai</option>
+          <option>Bakı — Nizami</option>
+          <option>Bakı — Pirallahı</option>
+          <option>Sumqayıt</option>
+          <option>Gəncə</option>
+          <option>Lənkəran</option>
+          <option>Şirvan</option>
+          <option>Mingəçevir</option>
+          <option>Naxçıvan</option>
+        </datalist>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div>
+    <div class="tips-card">
+      <h3>💡 Tez satmaq üçün</h3>
+      <div class="tip-item"><div class="tip-icon">📸</div><div class="tip-text"><strong>Keyfiyyətli fotolar çəkin.</strong> Təbii işıqda çəkilmiş şəkillər daha çox klik alır.</div></div>
+      <div class="tip-item"><div class="tip-icon">💰</div><div class="tip-text"><strong>Realistic qiymət qoyun.</strong> Orijinaldan 40-70% endirim ən çox satanlarda müşahidə olunur.</div></div>
+      <div class="tip-item"><div class="tip-icon">📝</div><div class="tip-text"><strong>Ətraflı təsvir yazın.</strong> Material, ölçü və vəziyyəti aydın ifadə edin.</div></div>
+      <div class="tip-item"><div class="tip-icon">⚡</div><div class="tip-text"><strong>Tez cavab verin.</strong> 1 saat ərzində cavab verən satıcılar 3x daha çox satır.</div></div>
+    </div>
+    <div class="publish-card">
+      <h3>Hazırsınız?</h3>
+      <p>Məhsulunuz yoxlanılandan sonra dərhal elan lövhəsində görünəcək. Komissiya yoxdur.</p>
+      <button class="btn-publish-big" id="publishSideBtn" onclick="publishProduct()">Elani yerləşdir</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+let selectedSize = '';
+let selectedCondition = 'new_with_tags';
+let uploadedImagePaths = [];
+let currentUser = null;
+
+// Init
+(async () => {
+  currentUser = await getCurrentUser();
+  if (!currentUser) { location.href = 'login.html'; return; }
+
+  const profile = await getCurrentProfile();
+  if (!profile || !profile.is_approved) {
+    document.getElementById('notApprovedAlert').style.display = 'block';
+    document.getElementById('publishNavBtn').disabled = true;
+    document.getElementById('publishSideBtn').disabled = true;
+  }
+
+  // Load categories
+  const { data: cats } = await db.from('categories').select('*').order('id');
+  const select = document.getElementById('category');
+  if (cats) cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.icon + ' ' + c.name;
+    select.appendChild(opt);
+  });
+})();
+
+function selectSize(btn) {
+  document.querySelectorAll('.size-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSize = btn.textContent;
+}
+
+function selectCondition(card, value) {
+  document.querySelectorAll('.condition-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  selectedCondition = value;
+}
+
+function updatePricePreview() {
+  const sell = parseFloat(document.getElementById('price').value) || 0;
+  const orig = parseFloat(document.getElementById('oldPrice').value) || 0;
+  document.getElementById('priceDisplay').textContent = '₼' + sell;
+  document.getElementById('earningsDisplay').textContent = '₼' + sell;
+  if (orig > sell && orig > 0) {
+    const pct = Math.round((1 - sell/orig)*100);
+    document.getElementById('discountRow').style.display = 'flex';
+    document.getElementById('discountDisplay').textContent = '−' + pct + '%';
+  } else {
+    document.getElementById('discountRow').style.display = 'none';
+  }
+}
+
+async function handleFiles(files) {
+  const grid = document.getElementById('photoGrid');
+  const area = document.getElementById('uploadArea');
+  const progress = document.getElementById('uploadProgress');
+  const progressBar = document.getElementById('uploadProgressBar');
+
+  const fileArr = Array.from(files).slice(0, 8);
+  progress.style.display = 'block';
+
+  for (let i = 0; i < fileArr.length; i++) {
+    const file = fileArr[i];
+    progressBar.style.width = ((i + 1) / fileArr.length * 100) + '%';
+
+    // Upload to Supabase Storage
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/${Date.now()}_${i}.${ext}`;
+
+    const { data, error } = await db.storage
+      .from('product-images')
+      .upload(path, file, { cacheControl: '3600', upsert: false });
+
+    if (!error) {
+      uploadedImagePaths.push(path);
+      const url = getProductImageUrl(path);
+
+      const div = document.createElement('div');
+      div.className = 'photo-preview';
+      div.dataset.path = path;
+      div.innerHTML = `
+        <img src="${url}" alt="">
+        ${uploadedImagePaths.length === 1 ? '<span class="main-label">Əsas</span>' : ''}
+        <button class="remove-btn" onclick="removePhoto(this,'${path}')">×</button>
+      `;
+      grid.appendChild(div);
+    }
+  }
+
+  progress.style.display = 'none';
+  progressBar.style.width = '0%';
+  if (uploadedImagePaths.length > 0) area.style.display = 'none';
+}
+
+async function removePhoto(btn, path) {
+  await db.storage.from('product-images').remove([path]);
+  uploadedImagePaths = uploadedImagePaths.filter(p => p !== path);
+  btn.parentElement.remove();
+  if (uploadedImagePaths.length === 0) {
+    document.getElementById('uploadArea').style.display = 'block';
+  }
+}
+
+async function publishProduct() {
+  const title    = document.getElementById('title').value.trim();
+  const brand    = document.getElementById('brand').value.trim();
+  const catId    = document.getElementById('category').value;
+  const price    = parseFloat(document.getElementById('price').value);
+  const oldPrice = parseFloat(document.getElementById('oldPrice').value) || null;
+  const desc     = document.getElementById('description').value.trim();
+  const color    = document.getElementById('color').value;
+  const location = document.getElementById('location').value;
+
+  if (!title)               { alert('Başlıq daxil edin.'); return; }
+  if (!brand)               { alert('Brend daxil edin.'); return; }
+  if (!catId)               { alert('Kateqoriya seçin.'); return; }
+  if (!selectedSize && !document.getElementById('sizeManual').value.trim()) { alert('Ölçü seçin və ya yazın.'); return; }
+  if (!price || price <= 0) { alert('Düzgün qiymət daxil edin.'); return; }
+  if (uploadedImagePaths.length === 0) { alert('Ən azı 1 foto yükləyin.'); return; }
+
+  const navBtn  = document.getElementById('publishNavBtn');
+  const sideBtn = document.getElementById('publishSideBtn');
+  navBtn.disabled = sideBtn.disabled = true;
+  navBtn.textContent = 'Göndərilir...';
+
+  const { data, error } = await db.from('products').insert({
+    seller_id:   currentUser.id,
+    category_id: parseInt(catId),
+    title,
+    brand,
+    description: desc,
+    price,
+    old_price:   oldPrice,
+    size:        selectedSize || document.getElementById('sizeManual').value.trim(),
+    condition:   selectedCondition,
+    color:       color || null,
+    location,
+    images:      uploadedImagePaths,
+    is_active:   true
+  }).select().single();
+
+  if (error) {
+    alert('Xəta: ' + error.message);
+    navBtn.disabled = sideBtn.disabled = false;
+    navBtn.textContent = 'Yerləşdir';
+  } else {
+    location.href = 'product.html?id=' + data.id;
+  }
+}
+</script>
+<style>
+    @media (max-width: 768px) {
+      .sell-page { grid-template-columns: 1fr; padding: 14px 12px 80px; gap: 0; }
+      .tips-card { display: none; }
+      .publish-card { border-radius: 0; padding: 12px 14px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; flex-direction: row; gap: 12px; align-items: center; }
+      .publish-card h3, .publish-card p, .btn-draft { display: none; }
+      .btn-publish-big { flex: 1; padding: 13px; font-size: 14.5px; }
+      .form-section { padding: 18px 14px; }
+      .form-section-title { font-size: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+      .condition-grid { grid-template-columns: 1fr 1fr; }
+      .photo-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .nav-title { font-size: 17px; }
+      .btn-cancel { display: none; }
+    }
+</style>
+
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Tariflər — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .page-hero { background:var(--cream2); border-bottom:1px solid var(--border); padding:52px 2rem 40px; }
+    .page-hero-inner { max-width:1000px; margin:0 auto; }
+    .page-title { font-size:52px; color:var(--navy); margin-bottom:10px; }
+    .page-subtitle { font-size:15px; color:var(--muted); line-height:1.7; max-width:560px; }
+    .plans-wrap { max-width:1000px; margin:0 auto; padding:52px 2rem 80px; }
+    .plans-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:52px; }
+    .plan-card { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:32px 28px; position:relative; display:flex; flex-direction:column; }
+    .plan-card.featured { border-color:var(--olive); box-shadow:0 8px 32px rgba(107,124,74,0.12); }
+    .plan-badge { position:absolute; top:-14px; left:50%; transform:translateX(-50%); background:var(--olive); color:white; font-size:12px; padding:4px 16px; border-radius:20px; white-space:nowrap; }
+    .plan-name { font-size:32px; color:var(--navy); margin-bottom:6px; }
+    .plan-price { font-family:'Amatic SC',cursive; font-size:52px; font-weight:700; color:var(--olive); line-height:1; margin-bottom:4px; }
+    .plan-period { font-size:13px; color:var(--muted); margin-bottom:20px; }
+    .plan-divider { border:none; border-top:1px solid var(--border); margin:20px 0; }
+    .plan-feature { display:flex; align-items:flex-start; gap:10px; margin-bottom:12px; font-size:14px; color:var(--muted); line-height:1.5; }
+    .plan-feature .check { color:var(--olive); flex-shrink:0; font-size:16px; }
+    .plan-feature .cross { color:#ccc; flex-shrink:0; font-size:16px; }
+    .plan-cta { margin-top:auto; padding-top:20px; }
+    .btn-plan-free { width:100%; font-family:inherit; font-size:15px; color:var(--olive); background:none; border:1.5px solid var(--olive); border-radius:10px; padding:13px; cursor:pointer; transition:all 0.18s; }
+    .btn-plan-free:hover { background:var(--olive); color:white; }
+    .btn-plan-soon { width:100%; font-family:inherit; font-size:15px; color:var(--muted); background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:13px; cursor:default; }
+    .btn-plan-featured { width:100%; font-family:inherit; font-size:15px; color:white; background:var(--olive); border:none; border-radius:10px; padding:13px; cursor:default; }
+
+    .faq-section { max-width:720px; margin:0 auto; }
+    .faq-section h2 { font-size:36px; color:var(--navy); margin-bottom:24px; text-align:center; }
+    .faq-item { background:var(--white); border:1px solid var(--border); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+    .faq-q { width:100%; text-align:left; font-family:inherit; font-size:15px; color:var(--navy); background:none; border:none; padding:18px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+    .faq-a { font-size:14px; color:var(--muted); line-height:1.7; padding:0 20px 18px; display:none; }
+    .faq-a.open { display:block; }
+
+    @media (max-width:768px) {
+      .plans-grid { grid-template-columns:1fr; gap:16px; }
+      .page-title { font-size:38px; }
+      .plans-wrap { padding:28px 12px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+<nav>
+  <a class="logo-wrap" href="index.html"><img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;"></a>
+  <div style="position:relative;">
+    <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+      Kataloq
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+    </button>
+    <div class="catalog-dropdown">
+      <div class="dropdown-sub">
+        <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+          🛍️ Məhsullar
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="dropdown-sub-menu">
+          <a href="category.html">Hamısı</a>
+          <a href="category.html?cat=Qadın">👗 Qadın</a>
+          <a href="category.html?cat=Kişi">👔 Kişi</a>
+          <a href="category.html?cat=Dizayner">Brendlər</a>
+          <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+          <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+          <a href="category.html?cat=İdman">🏃 İdman</a>
+          <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+          <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+          <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+          <a href="category.html?cat=Baxım">💄 Baxım</a>
+          <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+          <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+          <a href="category.html?cat=Digər">📦 Digər</a>
+        </div>
+      </div>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-section-label">✨ Xüsusi</div>
+      <a href="auction.html">🔨 Auksiyon</a>
+      <a href="swipe.html">💫 Kəşf et</a>
+      <a href="feed.html">📱 Feed</a>
+      <a href="blog.html">📝 Blog</a>
+    </div>
+  </div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <h1 class="page-title">Tariflər</h1>
+    <p class="page-subtitle">Dolab.az-da satış tamamilə pulsuzdur. Komissiya yoxdur, gizli ödəniş yoxdur. Gələcəkdə elanınızı daha çox insana çatdırmaq üçün könüllü reklam imkanları olacaq.</p>
+  </div>
+</section>
+
+<div class="plans-wrap">
+  <div class="plans-grid">
+
+    <!-- FREE -->
+    <div class="plan-card">
+      <div class="plan-name">Pulsuz</div>
+      <div class="plan-price">₼0</div>
+      <div class="plan-period">Həmişəlik pulsuz</div>
+      <hr class="plan-divider">
+      <div class="plan-feature"><span class="check">✓</span> Limitsiz elan yerləşdir</div>
+      <div class="plan-feature"><span class="check">✓</span> Alıcılarla mesajlaş</div>
+      <div class="plan-feature"><span class="check">✓</span> Komissiya yoxdur — satışın 100%-i sənin</div>
+      <div class="plan-feature"><span class="check">✓</span> Profil səhifəsi</div>
+      <div class="plan-feature"><span class="check">✓</span> Şəkil yüklə (8-ə qədər)</div>
+      <div class="plan-feature"><span class="check">✓</span> Auksiyon, Swipe, Feed</div>
+      <div class="plan-feature"><span class="cross">✗</span> Elan öncə göstərilmir</div>
+      <div class="plan-feature"><span class="cross">✗</span> Reklam banneri yoxdur</div>
+      <div class="plan-cta">
+        <button class="btn-plan-free" onclick="location.href='sell.html'">İndi başla</button>
+      </div>
+    </div>
+
+    <!-- BOOST -->
+    <div class="plan-card featured">
+      <div class="plan-badge">✨ Tezliklə</div>
+      <div class="plan-name">Boost</div>
+      <div class="plan-price" style="color:#856000;">₼?</div>
+      <div class="plan-period">7 günlük güclənmə</div>
+      <hr class="plan-divider">
+      <div class="plan-feature"><span class="check">✓</span> Pulsuz planın hər şeyi</div>
+      <div class="plan-feature"><span class="check">✓</span> Elanın əsas səhifədə öncə görünür</div>
+      <div class="plan-feature"><span class="check">✓</span> Kateqoriya siyahısında üstdə çıxır</div>
+      <div class="plan-feature"><span class="check">✓</span> "Boost" badge-i elanda görünür</div>
+      <div class="plan-feature"><span class="check">✓</span> Daha çox baxış, daha tez satış</div>
+      <div class="plan-feature"><span class="cross">✗</span> Satıcı profil reklamı yoxdur</div>
+      <div class="plan-cta">
+        <button class="btn-plan-featured">Tezliklə gəlir</button>
+      </div>
+    </div>
+
+    <!-- VIP -->
+    <div class="plan-card">
+      <div class="plan-name">VIP</div>
+      <div class="plan-price" style="color:#856000;">₼?</div>
+      <div class="plan-period">Aylıq abunə</div>
+      <hr class="plan-divider">
+      <div class="plan-feature"><span class="check">✓</span> Boost planının hər şeyi</div>
+      <div class="plan-feature"><span class="check">✓</span> Satıcı profili "VIP Satıcılar" bölməsində</div>
+      <div class="plan-feature"><span class="check">✓</span> Ana səhifədə reklam banneri</div>
+      <div class="plan-feature"><span class="check">✓</span> VIP profil badge-i</div>
+      <div class="plan-feature"><span class="check">✓</span> Bütün elanlar həmişə üstdə</div>
+      <div class="plan-feature"><span class="check">✓</span> Priority müştəri dəstəyi</div>
+      <div class="plan-cta">
+        <button class="btn-plan-soon">Tezliklə gəlir</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <h2>Tez-tez soruşulan suallar</h2>
+
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Həqiqətən komissiya yoxdur? <span>＋</span></button>
+      <div class="faq-a">Bəli. Dolab.az-da satdığınız məhsulun 100%-i sizindir. Heç bir gizli komissiya və ya ödəniş tutulmur.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Boost nə zaman aktiv olacaq? <span>＋</span></button>
+      <div class="faq-a">Platformamız böyüdükcə Boost xidməti əlavə ediləcək. İstifadəçilərə əvvəlcədən xəbər veriləcək.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Neçə elan yerləşdirə bilərəm? <span>＋</span></button>
+      <div class="faq-a">Pulsuz planda limitsiz elan yerləşdirə bilərsiniz.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Ödəniş sistemi nə zaman gələcək? <span>＋</span></button>
+      <div class="faq-a">Hal-hazırda alıcı ilə satıcı ödənişi birbaşa özləri həll edir — nağd, bank kartı və ya istənilən üsulla. Platforma ödənişə qarışmır.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo"><img src="assets/dolablogo.png" alt="Dolab.az"><p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma.</p></div>
+      <div class="footer-col"><h4>Kəşf et</h4><a href="category.html?cat=Qadın">Qadın</a><a href="category.html?cat=Kişi">Kişi</a></div>
+      <div class="footer-col"><h4>Satıcılar</h4><a href="howtosell.html">Necə satmalı</a><a href="tariflər.html">Tariflər</a></div>
+      <div class="footer-col"><h4>Şirkət</h4><a href="haqqimizda.html">Haqqımızda</a><a href="blog.html">Blog</a><a href="elaqe.html">Əlaqə</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Dolab.az</span></div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+updateNavAuth();
+function toggleFaq(btn) {
+  const a = btn.nextElementSibling;
+  a.classList.toggle('open');
+  btn.querySelector('span').textContent = a.classList.contains('open') ? '－' : '＋';
+}
+</script>
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+</body>
+</html>

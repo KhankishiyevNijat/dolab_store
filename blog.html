@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Blog — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .page-hero { background:var(--cream2); border-bottom:1px solid var(--border); padding:52px 2rem 40px; }
+    .page-hero-inner { max-width:1100px; margin:0 auto; }
+    .page-title { font-size:52px; color:var(--navy); margin-bottom:10px; }
+    .page-subtitle { font-size:15px; color:var(--muted); line-height:1.7; max-width:600px; }
+    .blog-wrap { max-width:1100px; margin:0 auto; padding:48px 2rem 72px; }
+    .admin-create { background:var(--white); border:1.5px dashed var(--olive); border-radius:16px; padding:24px; margin-bottom:40px; display:none; }
+    .admin-create h3 { font-size:26px; color:var(--navy); margin-bottom:18px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block; font-size:13px; color:var(--navy); margin-bottom:6px; }
+    .form-input { width:100%; font-family:inherit; font-size:14px; color:var(--navy); background:var(--cream2); border:1.5px solid var(--border); border-radius:9px; padding:10px 14px; outline:none; box-sizing:border-box; }
+    .form-input:focus { border-color:var(--olive); background:var(--white); }
+    textarea.form-input { min-height:160px; resize:vertical; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .btn-publish { font-family:inherit; font-size:14px; color:white; background:var(--olive); border:none; border-radius:9px; padding:12px 28px; cursor:pointer; }
+    .btn-publish:disabled { opacity:0.6; cursor:not-allowed; }
+    .cover-preview { width:100%; height:200px; border-radius:10px; object-fit:cover; margin-top:8px; display:none; }
+    .blog-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:28px; }
+    .blog-card { background:var(--white); border:1px solid var(--border); border-radius:18px; overflow:hidden; cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; text-decoration:none; display:block; color:inherit; }
+    .blog-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.09); }
+    .blog-thumb { height:220px; overflow:hidden; background:linear-gradient(135deg,#f3efe9,#e8d5c4); display:flex; align-items:center; justify-content:center; font-size:54px; position:relative; }
+    .blog-thumb img { width:100%; height:100%; object-fit:cover; }
+    .blog-category { position:absolute; top:14px; left:14px; background:var(--olive); color:white; font-size:11px; padding:4px 10px; border-radius:20px; text-transform:uppercase; }
+    .blog-body { padding:22px; }
+    .blog-meta { font-size:12px; color:var(--muted); margin-bottom:8px; }
+    .blog-card h2 { font-size:26px; color:var(--navy); margin-bottom:10px; line-height:1.2; }
+    .blog-card p { font-size:14px; color:var(--muted); line-height:1.75; margin-bottom:14px; }
+    .read-more { color:var(--olive); font-size:13.5px; }
+    .blog-skel { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:18px; height:340px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .btn-new-post { font-family:inherit; font-size:14px; color:var(--olive); background:none; border:1.5px solid var(--olive); border-radius:9px; padding:9px 20px; cursor:pointer; display:none; }
+    @media (max-width:768px) {
+      .blog-wrap { padding:24px 12px 80px; }
+      .blog-grid { grid-template-columns:1fr; gap:16px; }
+      .form-row { grid-template-columns:1fr; }
+      .page-title { font-size:38px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+    <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+      <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+      Kataloq
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+    </button>
+    <div class="catalog-dropdown">
+      <div class="dropdown-sub">
+        <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+          🛍️ Məhsullar
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <div class="dropdown-sub-menu">
+          <a href="category.html">Hamısı</a>
+          <a href="category.html?cat=Qadın">👗 Qadın</a>
+          <a href="category.html?cat=Kişi">👔 Kişi</a>
+          <a href="category.html?cat=Dizayner">Brendlər</a>
+          <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+          <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+          <a href="category.html?cat=İdman">🏃 İdman</a>
+          <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+          <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+          <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+          <a href="category.html?cat=Baxım">💄 Baxım</a>
+          <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+          <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+          <a href="category.html?cat=Digər">📦 Digər</a>
+        </div>
+      </div>
+      <div class="dropdown-divider"></div>
+      <div class="dropdown-section-label">✨ Xüsusi</div>
+      <a href="auction.html">🔨 Auksiyon</a>
+      <a href="swipe.html">💫 Kəşf et</a>
+      <a href="feed.html">📱 Feed</a>
+      <a href="blog.html">📝 Blog</a>
+    </div>
+  </div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul, brend, kateqoriya axtar...">
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="page-hero-inner">
+    <h1 class="page-title">Blog</h1>
+    <p class="page-subtitle">Dolab.az blogunda ikinci əl moda, stil məsləhətləri və davamlı alış-veriş vərdişləri haqqında yazılar.</p>
+  </div>
+</section>
+
+<div class="blog-wrap">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+    <button class="btn-new-post" id="btnNewPost" onclick="toggleCreate()">+ Yeni post</button>
+  </div>
+
+  <div class="admin-create" id="createForm">
+    <h3>Yeni blog postu</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Başlıq *</label>
+        <input class="form-input" id="blogTitle" placeholder="Məqalənin başlığı">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kateqoriya</label>
+        <input class="form-input" id="blogCategory" placeholder="Moda, Stil, Davamlılıq...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Qısa xülasə</label>
+      <input class="form-input" id="blogExcerpt" placeholder="Məqalənin qısa təsviri">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Əsas mətn *</label>
+      <textarea class="form-input" id="blogContent" placeholder="Məqalənin tam mətni..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Örtük şəkli</label>
+      <input type="file" id="blogCoverInput" accept="image/*" onchange="previewCover(this)" style="font-family:inherit;font-size:13px;">
+      <img id="coverPreview" class="cover-preview">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn-publish" id="publishBtn" onclick="publishPost()">Göndər (Admin təsdiqini gözləyir)</button>
+      <button onclick="toggleCreate()" style="font-family:inherit;font-size:14px;color:var(--muted);background:none;border:1.5px solid var(--border);border-radius:9px;padding:12px 20px;cursor:pointer;">Ləğv et</button>
+    </div>
+  </div>
+
+  <div class="blog-grid" id="blogGrid">
+    <div class="blog-skel"></div>
+    <div class="blog-skel"></div>
+    <div class="blog-skel"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="category.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Axtar</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+let currentUser = null;
+let coverFile = null;
+let isAdmin = false;
+
+(async () => {
+  currentUser = await getCurrentUser();
+  updateNavAuth();
+  if (currentUser) {
+    const { data: profile } = await db.from('profiles').select('is_admin').eq('id', currentUser.id).single();
+    isAdmin = profile?.is_admin === true;
+    document.getElementById('btnNewPost').style.display = 'inline-flex';
+  }
+  loadPosts();
+})();
+
+async function loadPosts() {
+  const grid = document.getElementById('blogGrid');
+  let query = db.from('blog_posts').select('*').order('created_at', { ascending: false });
+  if (!isAdmin) query = query.eq('is_verified', true);
+  const { data: posts } = await query;
+
+  if (!posts || posts.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted);"><h3 style="font-size:28px;color:var(--navy);">Hələ post yoxdur</h3><p>İlk blog postunu yaz!</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = posts.map(p => `
+    <a class="blog-card" href="blog-post.html?id=${p.id}" style="${!p.is_verified ? 'opacity:0.65;' : ''}">
+      <div class="blog-thumb">
+        ${p.cover_image ? `<img src="${p.cover_image}" alt="${p.title}">` : getBlogEmoji(p.category)}
+        ${p.category ? `<span class="blog-category">${p.category}</span>` : ''}
+        ${!p.is_verified ? '<span style="position:absolute;top:14px;right:14px;background:#856000;color:white;font-size:11px;padding:4px 10px;border-radius:20px;">⏳ Gözləyir</span>' : ''}
+      </div>
+      <div class="blog-body">
+        <div class="blog-meta">${new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}</div>
+        <h2>${p.title}</h2>
+        <p>${p.excerpt || p.content.substring(0, 120) + '...'}</p>
+        <span class="read-more">${p.is_verified ? 'Daha ətraflı oxu →' : '⏳ Admin təsdiqini gözləyir'}</span>
+      </div>
+    </a>
+  `).join('');
+}
+
+function getBlogEmoji(cat) {
+  const m = {'Moda':'👗','Stil':'👜','Davamlılıq':'♻️','Məsləhət':'💡','Xəbər':'📰'};
+  return m[cat] || '✨';
+}
+
+function toggleCreate() {
+  const f = document.getElementById('createForm');
+  f.style.display = f.style.display === 'block' ? 'none' : 'block';
+}
+
+function previewCover(input) {
+  coverFile = input.files[0];
+  if (!coverFile) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('coverPreview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(coverFile);
+}
+
+async function publishPost() {
+  const title = document.getElementById('blogTitle').value.trim();
+  const content = document.getElementById('blogContent').value.trim();
+  if (!title || !content) { alert('Başlıq və mətn mütləqdir'); return; }
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true;
+  btn.textContent = 'Göndərilir...';
+
+  let coverUrl = null;
+  if (coverFile) {
+    const ext = coverFile.name.split('.').pop();
+    const path = `covers/${Date.now()}.${ext}`;
+    const { error: upErr } = await db.storage.from('blog-images').upload(path, coverFile, { upsert: true });
+    if (!upErr) {
+      const { data: urlData } = db.storage.from('blog-images').getPublicUrl(path);
+      coverUrl = urlData.publicUrl;
+    }
+  }
+
+  const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now();
+
+  const { error } = await db.from('blog_posts').insert({
+    title,
+    slug,
+    excerpt: document.getElementById('blogExcerpt').value.trim() || null,
+    content,
+    cover_image: coverUrl,
+    category: document.getElementById('blogCategory').value.trim() || null,
+    author_id: currentUser.id,
+    is_published: true,
+    is_verified: false
+  });
+
+  if (error) {
+    alert('Xəta: ' + error.message);
+    btn.disabled = false;
+    btn.textContent = 'Göndər (Admin təsdiqini gözləyir)';
+    return;
+  }
+
+  btn.textContent = '✓ Göndərildi!';
+  setTimeout(() => {
+    document.getElementById('createForm').style.display = 'none';
+    document.getElementById('blogTitle').value = '';
+    document.getElementById('blogContent').value = '';
+    document.getElementById('blogExcerpt').value = '';
+    document.getElementById('blogCategory').value = '';
+    document.getElementById('coverPreview').style.display = 'none';
+    coverFile = null;
+    btn.disabled = false;
+    btn.textContent = 'Göndər (Admin təsdiqini gözləyir)';
+    loadPosts();
+  }, 1000);
+}
+</script>
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+</body>
+</html>

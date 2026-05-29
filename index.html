@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dolab.az — İkinci əl moda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    .section { max-width:1160px; margin:0 auto; padding:52px 2rem; }
+
+    .hero { position:relative; width:100%; height:460px; overflow:hidden; background:#d4ccc2; }
+    .hero-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+    .hero-overlay { position:absolute; inset:0; background:linear-gradient(to right,rgba(250,248,245,0.92) 0%,rgba(250,248,245,0.6) 45%,rgba(250,248,245,0) 70%); z-index:1; }
+    .hero-card { position:absolute; left:56px; top:50%; transform:translateY(-50%); z-index:2; background:var(--white); border-radius:14px; padding:38px 42px 42px; width:340px; box-shadow:0 8px 40px rgba(0,0,0,0.12); }
+    @media (max-width: 768px) {
+    .hero-card { left:12px; right:12px; width:auto; padding:22px 20px 26px; }
+    .hero-card h1 { font-size:26px; margin-bottom:16px; }
+     }
+  
+    .hero-card h1 { font-size:40px; line-height:1.12; color:var(--navy); margin-bottom:26px; letter-spacing:0.5px; }
+    .hero-card .card-btn { display:block; width:100%; font-family:inherit; font-size:15px; font-weight:400; color:var(--white); background:var(--olive); border:none; border-radius:9px; padding:13px 20px; cursor:pointer; text-align:center; margin-bottom:14px; transition:background 0.18s; }
+    .hero-card .card-btn:hover { background:var(--olive-dark); }
+    .hero-card .card-link { display:block; text-align:center; font-family:inherit; font-size:14px; font-weight:300; color:var(--olive); cursor:pointer; text-decoration:none; }
+    .hero-card .card-link:hover { color:var(--navy); text-decoration:underline; }
+
+    .stats-strip { background:var(--cream2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:20px 2.5rem; display:flex; align-items:center; justify-content:center; gap:64px; }
+    .stat { text-align:center; }
+    .stat-num { font-family:'Amatic SC',cursive; font-size:32px; font-weight:700; color:var(--olive); line-height:1; }
+    .stat-label { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    .cta-banner { background:var(--navy); border-radius:20px; padding:52px 56px; max-width:1160px; margin:0 auto 52px; display:flex; align-items:center; justify-content:space-between; gap:32px; flex-wrap:wrap; position:relative; overflow:hidden; }
+    .cta-banner::before { content:''; position:absolute; right:-40px; top:-40px; width:240px; height:240px; background:rgba(201,169,138,0.08); border-radius:50%; }
+    .cta-banner::after  { content:''; position:absolute; right:80px; bottom:-60px; width:180px; height:180px; background:rgba(107,124,74,0.08); border-radius:50%; }
+    .cta-text h2 { font-size:36px; color:var(--white); margin-bottom:8px; }
+    .cta-text p  { font-size:14.5px; color:rgba(255,255,255,0.65); line-height:1.65; max-width:400px; }
+    .btn-cta { font-family:inherit; font-size:15px; font-weight:400; color:var(--navy); background:var(--white); border:none; border-radius:10px; padding:14px 32px; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:background 0.18s,transform 0.18s; }
+    .btn-cta:hover { background:var(--cream); transform:translateY(-2px); }
+
+    .how-section { background:var(--cream2); padding:64px 2rem; text-align:center; }
+    .how-section h2 { font-size:40px; color:var(--navy); margin-bottom:6px; }
+    .how-section > p { font-size:14.5px; color:var(--muted); margin-bottom:48px; }
+    .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:20px; max-width:1000px; margin:0 auto; }
+    .step { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:30px 26px; text-align:left; }
+    .step-num { font-family:'Amatic SC',cursive; font-size:44px; font-weight:700; color:var(--nude-light); margin-bottom:14px; line-height:1; }
+    .step-icon { font-size:30px; margin-bottom:12px; }
+    .step h3 { font-size:22px; color:var(--navy); margin-bottom:8px; }
+    .step p { font-size:13.5px; color:var(--muted); line-height:1.65; }
+
+    .empty-state { text-align:center; padding:64px 2rem; color:var(--muted); }
+    .empty-state h3 { font-size:28px; color:var(--navy); margin-bottom:8px; }
+    .skeleton { background:linear-gradient(90deg,var(--cream2) 25%,var(--border) 50%,var(--cream2) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:14px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .card-skeleton { height:320px; }
+
+    /* ══════════════════════════════════
+       MOBİL — index.html
+       ══════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* NAV: yalnız logo + axtarış + profil ikonu */
+      nav {
+        padding: 0 12px;
+        height: 54px;
+        gap: 8px;
+        overflow: hidden;
+      }
+      .logo-wrap img { height: 72px; }
+      .-btn { display: none; }
+      .btn-auth { display: none; }
+      .btn-sell { display: none; }
+      .search-bar {
+        flex: 1;
+        max-width: none;
+        padding: 0 10px;
+      }
+      .search-bar .cam { display: none; }
+      .nav-right { gap: 6px; margin-left: 0; }
+      .icon-btn { width: 34px; height: 34px; }
+
+      /* CAT NAV */
+      .cat-nav { padding: 0 8px; }
+      .cat-item { padding: 12px 10px; font-size: 12.5px; }
+
+      /* HERO */
+      .hero { height: 280px; }
+      .hero-overlay {
+        background: linear-gradient(to right,
+          rgba(250,248,245,0.97) 0%,
+          rgba(250,248,245,0.85) 55%,
+          rgba(250,248,245,0.2) 100%);
+      }
+      .hero-card {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        padding: 22px 20px 26px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .hero-card h1 {
+        font-size: 26px;
+        margin-bottom: 16px;
+        line-height: 1.15;
+      }
+      .hero-card .card-btn {
+        padding: 11px 16px;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+      .hero-card .card-link { font-size: 13px; }
+
+      /* STATS */
+      .stats-strip {
+        gap: 0;
+        padding: 14px 8px;
+        justify-content: space-around;
+      }
+      .stat-num { font-size: 24px; }
+      .stat-label { font-size: 10.5px; }
+
+      /* SECTION */
+      .section { padding: 28px 12px; }
+      .section-title { font-size: 26px; }
+      .section-link { font-size: 13px; }
+
+      /* GRID — 2 sütun */
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .card-skeleton { height: 240px; }
+
+      /* CTA BANNER */
+      .cta-banner {
+        padding: 28px 20px;
+        flex-direction: column;
+        text-align: center;
+        border-radius: 14px;
+        margin-bottom: 28px;
+      }
+      .cta-text h2 { font-size: 26px; margin-bottom: 8px; }
+      .cta-text p { font-size: 13.5px; }
+      .btn-cta { width: 100%; padding: 13px; }
+
+      /* HOW IT WORKS */
+      .how-section { padding: 36px 14px; }
+      .how-section h2 { font-size: 32px; }
+      .how-section > p { font-size: 13.5px; margin-bottom: 28px; }
+      .steps { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .step { padding: 18px 14px; }
+      .step-num { font-size: 32px; margin-bottom: 10px; }
+      .step-icon { font-size: 24px; margin-bottom: 8px; }
+      .step h3 { font-size: 18px; }
+      .step p { font-size: 12.5px; }
+
+      /* FOOTER */
+      footer { padding: 36px 14px 24px; }
+      .footer-top { flex-direction: column; gap: 24px; }
+      .footer-logo img { height: 100px; }
+      .footer-bottom { flex-direction: column; text-align: center; font-size: 12px; }
+
+      /* BOTTOM PADDING for bottom nav */
+      body { padding-bottom: 68px; }
+    }
+
+    /* ── MOBİL BOTTOM NAV ── */
+    .mobile-bottom-nav {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+        z-index: 300;
+        padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+      }
+      .bnav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 10px;
+        font-family: inherit;
+        font-weight: 300;
+        padding: 4px 0;
+        transition: color 0.15s;
+      }
+      .bnav-item.active { color: var(--olive); }
+      .bnav-sell {
+        flex: none;
+        width: 46px;
+        height: 46px;
+        background: var(--olive);
+        border-radius: 50%;
+        margin-top: -14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(107,124,74,0.35);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!
+</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+  <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="catalog-dropdown">
+    <div class="dropdown-sub">
+      <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+        🛍️ Məhsullar
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="dropdown-sub-menu">
+        <a href="category.html">Hamısı</a>
+        <a href="category.html?cat=Qadın">👗 Qadın</a>
+        <a href="category.html?cat=Kişi">👔 Kişi</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+        <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+        <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+        <a href="category.html?cat=İdman">🏃 İdman</a>
+        <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+        <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+        <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+        <a href="category.html?cat=Baxım">💄 Baxım</a>
+        <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+        <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+        <a href="category.html?cat=Digər">📦 Digər</a>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-section-label">✨ Xüsusi</div>
+    <a href="auction.html">🔨 Auksiyon</a>
+    <a href="swipe.html">💫 Kəşf et</a>
+    <a href="feed.html">📱 Feed</a>
+  </div>
+</div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Məhsul, brend, kateqoriya axtar..." onkeydown="if(event.key==='Enter')doSearch()">
+    <svg class="icon cam" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+  </div>
+  <div class="nav-right">
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" id="nav-sell-btn" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html" title="Sevimlilər">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html" title="Profil">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </a>
+  </div>
+</nav>
+
+<div class="cat-nav">
+
+  <a class="cat-item active" href="category.html">Hamısı</a>
+  <a class="cat-item" href="category.html?cat=Qadın">Qadın</a>
+  <a class="cat-item" href="category.html?cat=Kişi">Kişi</a>
+  <a class="cat-item" href="category.html?cat=Uşaq">Uşaq</a>
+  <a class="cat-item" href="category.html?cat=Dizayner">Brendlər</a>
+  <a class="cat-item" href="category.html?cat=Ayaqqabı">Ayaqqabı</a>
+  <a class="cat-item" href="category.html?cat=İdman">İdman</a>
+  <a class="cat-item" href="category.html?cat=Aksessuar">Aksessuar</a>
+  <a class="cat-item" href="category.html?cat=Xüsusi gün geyimi">Xüsusi gün geyimi</a>
+  <a class="cat-item" href="category.html?cat=Çantalar">Çantalar</a>
+  <a class="cat-item" href="category.html?cat=Baxım">Baxım</a>
+<a class="cat-item" href="category.html?cat=Ev əşyaları">Ev əşyaları</a>
+<a class="cat-item" href="category.html?cat=Parfüm">Parfüm</a>
+<a class="cat-item" href="category.html?cat=Digər">Digər</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <img class="hero-img" src="assets/banner.png" alt="Dolab.az hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-card">
+    <h1>Dolabını boşalt, pul qazan</h1>
+    <button class="card-btn" onclick="location.href='sell.html'">İndi sat</button>
+    <a class="card-link" href="howtosell.html">Necə işləyir?</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stat"><div class="stat-num" id="stat-users">—</div><div class="stat-label">İstifadəçi</div></div>
+  <div class="stat"><div class="stat-num" id="stat-products">—</div><div class="stat-label">Aktiv elan</div></div>
+  <div class="stat"><div class="stat-num">₼0</div><div class="stat-label">Komissiya</div></div>
+  <div class="stat"><div class="stat-num">4.9★</div><div class="stat-label">Orta reytinq</div></div>
+</div>
+
+<!-- NEW ARRIVALS -->
+<div class="section">
+  <div class="section-header">
+    <h2 class="section-title">Yeni əlavələr</h2>
+    <a class="section-link" href="category.html">Hamısına bax →</a>
+  </div>
+  <div class="grid" id="productsGrid">
+    <!-- skeleton -->
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+    <div class="skeleton card-skeleton"></div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div style="padding:0 2rem;">
+  <div class="cta-banner">
+    <div class="cta-text">
+      <h2>Dolabını boşalt, pul qazan 💸</h2>
+      <p>Geyinmədiyiniz paltarları 3 dəqiqədə yerləşdirin. Satış baş tutanda anında bildiriş alın. Komissiya yoxdur.</p>
+    </div>
+    <button class="btn-cta" onclick="location.href='sell.html'">İndi satmağa başla</button>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section" id="nece-isleyir">
+  <h2>Necə işləyir?</h2>
+  <p>Üç sadə addımda al ya da sat</p>
+  <div class="steps">
+    <div class="step"><div class="step-num">01</div><div class="step-icon">📸</div><h3>Foto çək, yüklə</h3><p>Paltarını fotosu ilə yüklə, qiymətini özün təyin et. 3 dəqiqə çəkir.</p></div>
+    <div class="step"><div class="step-num">02</div><div class="step-icon">💬</div><h3>Alıcı ilə danış</h3><p>Maraqlanın alıcılar birbaşa sizinlə əlaqə qurar, razılaşın.</p></div>
+    <div class="step"><div class="step-num">03</div><div class="step-icon">📦</div><h3>Göndər, pul al</h3><p>Sifariş təsdiqlənən kimi ödəniş birbaşa hesabınıza keçir.</p></div>
+    <div class="step"><div class="step-num">04</div><div class="step-icon">♻️</div><h3>Davamlı moda</h3><p>Hər satışla Azərbaycanda davamlı modaya töhfə verirsiniz.</p></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-logo">
+        <img src="assets/dolablogo.png" alt="Dolab.az">
+        <p>Azərbaycanda ikinci əl moda üçün ən etibarlı platforma. Komissiya yoxdur.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kəşf et</h4>
+        <a href="category.html?cat=Qadın">Qadın geyimləri</a>
+        <a href="category.html?cat=Kişi">Kişi geyimləri</a>
+        <a href="category.html?cat=Uşaq">Uşaq geyimləri</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+      </div>
+      <div class="footer-col">
+        <h4>Satıcılar</h4>
+        <a href="howtosell.html">Necə satmalı</a>
+        <a href="tariflər.html">Tariflər</a>
+        <a href="catdirilma.html">Çatdırılma</a>
+        <a href="odenis.html">Ödəniş</a>
+      </div>
+      <div class="footer-col">
+        <h4>Şirkət</h4>
+        <a href="haqqimizda.html">Haqqımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="elaqe.html">Əlaqə</a>
+        <a href="privacy.html">Gizlilik siyasəti</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Dolab.az — Bütün hüquqlar qorunur</span>
+      <span style="color:rgba(255,255,255,0.3);">Bakı, Azərbaycan 🇦🇿</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+async function loadProducts() {
+  const grid = document.getElementById('productsGrid');
+
+  const { data: products, error } = await db
+    .from('products_with_seller')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(8);
+
+  if (error || !products || products.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <h3>Hələ məhsul yoxdur</h3>
+        <p>İlk məhsulu sən yerləşdir!</p>
+        <br>
+        <a class="btn-sell" href="sell.html" style="display:inline-flex;">İndi sat</a>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = products.map(createProductCard).join('');
+}
+
+async function loadStats() {
+  const [{ count: userCount }, { count: productCount }] = await Promise.all([
+    db.from('profiles').select('*', { count: 'exact', head: true }),
+    db.from('products').select('*', { count: 'exact', head: true }).eq('is_active', true).eq('is_sold', false)
+  ]);
+  document.getElementById('stat-users').textContent = (userCount || 0) + '+';
+  document.getElementById('stat-products').textContent = (productCount || 0) + '+';
+}
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (q) location.href = 'category.html?q=' + encodeURIComponent(q);
+}
+
+// Init
+updateNavAuth();
+loadProducts();
+loadStats();
+</script>
+<!-- MOBİL BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a href="index.html" class="bnav-item active">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Ana səhifə
+  </a>
+  <a href="category.html" class="bnav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Axtar
+  </a>
+  <a href="sell.html" class="bnav-sell">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </a>
+  <a href="favorites.html" class="bnav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Sevimlilər
+  </a>
+  <a href="profile.html" class="bnav-item">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profil
+  </a>
+</nav>
+
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+
+<script>
+let lastScroll = 0;
+window.addEventListener('scroll', function() {
+  const nav = document.querySelector('.mobile-bottom-nav');
+  if (!nav) return;
+  const curr = window.scrollY;
+  if (curr > lastScroll && curr > 100) {
+    nav.style.transform = 'translateY(100%)';
+  } else {
+    nav.style.transform = 'translateY(0)';
+  }
+  lastScroll = curr;
+});
+</script>
+
+</body>
+
+</html>

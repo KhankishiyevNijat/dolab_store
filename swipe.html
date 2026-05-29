@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Kəşf et — Dolab.az</title>
+  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/shared.css"/>
+  <style>
+    body { overflow-x:hidden; }
+    .swipe-page { max-width:420px; margin:0 auto; padding:16px 16px 100px; }
+
+    /* HEADER */
+    .swipe-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .swipe-title { font-size:32px; color:var(--navy); }
+    .swipe-filter-btn { font-family:inherit; font-size:13px; color:var(--muted); background:none; border:1.5px solid var(--border); border-radius:8px; padding:7px 12px; cursor:pointer; }
+
+    /* CARD STACK */
+    .card-stack { position:relative; height:520px; margin-bottom:20px; }
+    .swipe-card { position:absolute; inset:0; background:var(--white); border-radius:20px; border:1px solid var(--border); overflow:hidden; cursor:grab; user-select:none; box-shadow:0 4px 20px rgba(0,0,0,0.08); transition:box-shadow 0.2s; touch-action:none; }
+    .swipe-card:active { cursor:grabbing; }
+    .swipe-card.behind { transform:scale(0.95) translateY(8px); z-index:0; pointer-events:none; }
+    .swipe-card.top { z-index:10; }
+    .swipe-card-img { width:100%; height:340px; object-fit:cover; object-position:top; background:var(--cream2); display:flex; align-items:center; justify-content:center; font-size:80px; }
+    .swipe-card-img img { width:100%; height:100%; object-fit:cover; object-position:top; }
+    .swipe-card-body { padding:16px 18px; }
+    .swipe-card-brand { font-size:11px; color:var(--olive); font-weight:500; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:3px; }
+    .swipe-card-title { font-size:22px; color:var(--navy); margin-bottom:6px; line-height:1.2; }
+    .swipe-card-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .swipe-card-price { font-family:'Amatic SC',cursive; font-size:26px; font-weight:700; color:var(--olive); }
+    .swipe-card-size { font-size:12px; background:var(--cream2); color:var(--muted); padding:3px 8px; border-radius:6px; }
+    .swipe-card-location { font-size:12px; color:var(--muted); }
+
+    /* SWIPE OVERLAYS */
+    .swipe-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; border-radius:20px; transition:opacity 0.15s; pointer-events:none; }
+    .overlay-like { background:rgba(46,204,113,0.15); border:3px solid #2ecc71; }
+    .overlay-nope { background:rgba(231,76,60,0.15); border:3px solid #e74c3c; }
+    .overlay-super { background:rgba(52,152,219,0.15); border:3px solid #3498db; }
+    .overlay-label { font-family:'Amatic SC',cursive; font-size:48px; font-weight:700; transform:rotate(-20deg); }
+    .overlay-like .overlay-label { color:#2ecc71; }
+    .overlay-nope .overlay-label { color:#e74c3c; transform:rotate(20deg); }
+    .overlay-super .overlay-label { color:#3498db; transform:rotate(0); font-size:40px; }
+
+    /* ACTION BUTTONS */
+    .swipe-actions { display:flex; align-items:center; justify-content:center; gap:16px; }
+    .swipe-btn { width:56px; height:56px; border-radius:50%; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:22px; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:transform 0.15s, box-shadow 0.15s; }
+    .swipe-btn:hover { transform:scale(1.1); box-shadow:0 6px 20px rgba(0,0,0,0.15); }
+    .swipe-btn:active { transform:scale(0.95); }
+    .btn-nope { background:white; color:#e74c3c; border:2px solid #fde8e8; width:52px; height:52px; font-size:20px; }
+    .btn-msg { background:white; color:#3498db; border:2px solid #e3f2fd; }
+    .btn-like { background:white; color:#2ecc71; border:2px solid #d4f5e2; width:64px; height:64px; font-size:26px; }
+    .btn-fav { background:white; color:var(--nude); border:2px solid #fde8e8; width:52px; height:52px; font-size:20px; }
+
+    /* EMPTY */
+    .swipe-empty { text-align:center; padding:60px 20px; }
+    .swipe-empty-icon { font-size:64px; margin-bottom:16px; }
+    .swipe-empty h3 { font-size:28px; color:var(--navy); margin-bottom:8px; }
+    .swipe-empty p { font-size:14px; color:var(--muted); margin-bottom:24px; }
+    .btn-refresh { font-family:inherit; font-size:14px; color:white; background:var(--olive); border:none; border-radius:10px; padding:12px 28px; cursor:pointer; }
+
+    /* MSG MODAL */
+    .msg-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:flex-end; justify-content:center; }
+    .msg-modal.open { display:flex; }
+    .msg-sheet { background:var(--white); border-radius:20px 20px 0 0; width:100%; max-width:420px; padding:20px 20px 32px; }
+    .msg-sheet h3 { font-size:24px; color:var(--navy); margin-bottom:6px; }
+    .msg-sheet p { font-size:13.5px; color:var(--muted); margin-bottom:16px; }
+    .msg-textarea { width:100%; font-family:inherit; font-size:14px; background:var(--cream2); border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; outline:none; resize:none; min-height:100px; box-sizing:border-box; }
+    .msg-textarea:focus { border-color:var(--olive); background:var(--white); }
+    .msg-sheet-actions { display:flex; gap:10px; margin-top:12px; }
+    .msg-send-btn { flex:1; font-family:inherit; font-size:15px; color:white; background:var(--olive); border:none; border-radius:10px; padding:13px; cursor:pointer; }
+    .msg-cancel-btn { font-family:inherit; font-size:14px; color:var(--muted); background:none; border:1.5px solid var(--border); border-radius:10px; padding:13px 20px; cursor:pointer; }
+
+    /* STATS */
+    .swipe-stats { display:flex; justify-content:center; gap:28px; margin-bottom:16px; }
+    .stat { text-align:center; }
+    .stat-n { font-family:'Amatic SC',cursive; font-size:28px; color:var(--navy); font-weight:700; }
+    .stat-l { font-size:11px; color:var(--muted); }
+
+    /* LOGIN PROMPT */
+    .login-prompt { background:var(--white); border:1px solid var(--border); border-radius:16px; padding:32px 20px; text-align:center; margin-top:40px; }
+    .login-prompt h3 { font-size:26px; color:var(--navy); margin-bottom:8px; }
+    .login-prompt p { font-size:14px; color:var(--muted); margin-bottom:20px; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">🎉 Dolab.az-a xoş gəldiniz — <strong>Komissiya yoxdur</strong>, satışın 100%-i sizindir!</div>
+
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <img src="assets/dolablogo.png" alt="Dolab.az" style="mix-blend-mode:multiply;">
+  </a>
+  <div style="position:relative;">
+  <button class="catalog-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="0" y1="1" x2="14" y2="1"/><line x1="0" y1="5" x2="14" y2="5"/><line x1="0" y1="9" x2="14" y2="9"/></svg>
+    Kataloq
+    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polyline points="1 1 5 5 9 1"/></svg>
+  </button>
+  <div class="catalog-dropdown">
+    <div class="dropdown-sub">
+      <button class="dropdown-sub-btn" onclick="var m=this.nextElementSibling;m.classList.toggle('open');event.stopPropagation()">
+        🛍️ Məhsullar
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="dropdown-sub-menu">
+        <a href="category.html">Hamısı</a>
+        <a href="category.html?cat=Qadın">👗 Qadın</a>
+        <a href="category.html?cat=Kişi">👔 Kişi</a>
+        <a href="category.html?cat=Dizayner">Brendlər</a>
+        <a href="category.html?cat=Uşaq">🧒 Uşaq</a>
+        <a href="category.html?cat=Ayaqqabı">👟 Ayaqqabı</a>
+        <a href="category.html?cat=İdman">🏃 İdman</a>
+        <a href="category.html?cat=Aksessuar">💍 Aksessuar</a>
+        <a href="category.html?cat=Xüsusi gün geyimi">💐 Xüsusi gün geyimi</a>
+        <a href="category.html?cat=Çantalar">👜 Çantalar</a>
+        <a href="category.html?cat=Baxım">💄 Baxım</a>
+        <a href="category.html?cat=Ev əşyaları">🏠 Ev əşyaları</a>
+        <a href="category.html?cat=Parfüm">🌸 Parfüm</a>
+        <a href="category.html?cat=Digər">📦 Digər</a>
+      </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-section-label">✨ Xüsusi</div>
+    <a href="auction.html">🔨 Auksiyon</a>
+    <a href="swipe.html">💫 Kəşf et</a>
+    <a href="feed.html">📱 Feed</a>
+  </div>
+</div>
+  <div class="search-bar" onclick="if(window.innerWidth<=768){this.classList.toggle('expanded');if(this.classList.contains('expanded')){this.querySelector('input').focus()}}">
+    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Məhsul axtar...">
+  </div>
+  <div class="nav-right">
+
+    <a class="btn-auth" id="nav-auth-btn" href="login.html">Giriş | Qeydiyyat</a>
+    <a class="btn-sell" href="sell.html">İndi sat</a>
+    <a class="icon-btn" href="favorites.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></a>
+    <a class="icon-btn" id="nav-profile-btn" href="profile.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a>
+  </div>
+</nav>
+
+<!-- MSG MODAL -->
+<div class="msg-modal" id="msgModal">
+  <div class="msg-sheet">
+    <h3>Satıcıya mesaj</h3>
+    <p id="msgSheetDesc">Sual ver və ya qiymət soruş</p>
+    <textarea class="msg-textarea" id="msgText" placeholder="Məsələn: Bu hələ satışdadır? Ölçüsü necədir?"></textarea>
+    <div class="msg-sheet-actions">
+      <button class="msg-cancel-btn" onclick="closeMsgModal()">Ləğv et</button>
+      <button class="msg-send-btn" onclick="sendSwipeMsg()">Göndər →</button>
+    </div>
+  </div>
+</div>
+
+<div class="swipe-page">
+  <div class="swipe-header">
+    <h1 class="swipe-title">✨ Kəşf et</h1>
+    <button class="swipe-filter-btn" onclick="location.href='category.html'">🔍 Filter</button>
+  </div>
+
+  <div class="swipe-stats" id="swipeStats" style="display:none;">
+    <div class="stat"><div class="stat-n" id="statLiked">0</div><div class="stat-l">Bəyənildi</div></div>
+    <div class="stat"><div class="stat-n" id="statSkipped">0</div><div class="stat-l">Keçildi</div></div>
+    <div class="stat"><div class="stat-n" id="statMsg">0</div><div class="stat-l">Mesaj</div></div>
+  </div>
+
+  <div class="card-stack" id="cardStack">
+    <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);">Yüklənir...</div>
+  </div>
+
+  <div class="swipe-actions" id="swipeActions" style="display:none;">
+    <button class="swipe-btn btn-nope" onclick="swipe('left')" title="Bəyənmirəm">✕</button>
+    <button class="swipe-btn btn-msg" onclick="openMsgModal()" title="Mesaj göndər">💬</button>
+    <button class="swipe-btn btn-like" onclick="swipe('right')" title="Bəyəndim">♥</button>
+    <button class="swipe-btn btn-fav" onclick="swipe('up')" title="Sevimlilərə əlavə et">⭐</button>
+  </div>
+
+  <div id="loginPromptBox" style="display:none;">
+    <div class="login-prompt">
+      <div style="font-size:48px;margin-bottom:12px;">👗</div>
+      <h3>Kəşf etməyə başla</h3>
+      <p>Geyimləri swipe et, bəyəndiklərini birbaşa sevimlilərə əlavə et</p>
+      <a href="login.html" style="font-family:inherit;font-size:14px;color:white;background:var(--olive);border:none;border-radius:10px;padding:12px 28px;text-decoration:none;display:inline-block;">Giriş et</a>
+    </div>
+  </div>
+</div>
+
+<nav class="mobile-bottom-nav" style="top:auto!important;">
+  <a href="index.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana səhifə</a>
+  <a href="swipe.html" class="bnav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Kəşf et</a>
+  <a href="sell.html" class="bnav-sell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></a>
+  <a href="favorites.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Sevimlilər</a>
+  <a href="profile.html" class="bnav-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+let currentUser = null;
+let products = [];
+let currentIdx = 0;
+let isDragging = false;
+let startX = 0, startY = 0, currentX = 0, currentY = 0;
+let stats = { liked: 0, skipped: 0, msg: 0 };
+let currentMsgProductId = null;
+let currentMsgSellerId = null;
+
+(async () => {
+  currentUser = await getCurrentUser();
+  updateNavAuth();
+  if (!currentUser) {
+    document.getElementById('loginPromptBox').style.display = 'block';
+    document.getElementById('cardStack').style.display = 'none';
+    return;
+  }
+  await loadProducts();
+})();
+
+async function loadProducts() {
+  // Get already swiped products
+  const { data: swiped } = await db.from('swipe_history')
+    .select('product_id').eq('user_id', currentUser.id);
+  const swipedIds = (swiped || []).map(s => s.product_id);
+
+  let query = db.from('products_with_seller').select('*')
+    .eq('is_sold', false).eq('is_active', true)
+    .neq('seller_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(30);
+
+  const { data } = await query;
+  products = (data || []).filter(p => !swipedIds.includes(p.id));
+
+  if (products.length === 0) {
+    showEmpty();
+    return;
+  }
+
+  document.getElementById('swipeActions').style.display = 'flex';
+  document.getElementById('swipeStats').style.display = 'flex';
+  renderCards();
+}
+
+function renderCards() {
+  const stack = document.getElementById('cardStack');
+  stack.innerHTML = '';
+
+  // Show 2 cards max
+  [1, 0].forEach(offset => {
+    const idx = currentIdx + offset;
+    if (idx >= products.length) return;
+    const p = products[idx];
+    const card = createSwipeCard(p, offset === 0);
+    stack.appendChild(card);
+  });
+
+  if (currentIdx < products.length) setupDrag();
+}
+
+function createSwipeCard(p, isTop) {
+  const img = p.images && p.images[0] ? getProductImageUrl(p.images[0]) : null;
+  const card = document.createElement('div');
+  card.className = 'swipe-card ' + (isTop ? 'top' : 'behind');
+  card.id = 'swipe_card_' + p.id;
+  card.innerHTML = `
+    <div class="swipe-card-img">
+      ${img ? `<img src="${img}" alt="${p.title}" draggable="false">` : '👗'}
+    </div>
+    <div class="swipe-overlay overlay-like" id="overlay_like_${p.id}">
+      <div class="overlay-label">BƏYƏNDIM ♥</div>
+    </div>
+    <div class="swipe-overlay overlay-nope" id="overlay_nope_${p.id}">
+      <div class="overlay-label">KEÇ ✕</div>
+    </div>
+    <div class="swipe-overlay overlay-super" id="overlay_super_${p.id}">
+      <div class="overlay-label">⭐ SEVİMLİ</div>
+    </div>
+    <div class="swipe-card-body">
+      <div class="swipe-card-brand">${p.brand || ''}</div>
+      <div class="swipe-card-title">${p.title}</div>
+      <div class="swipe-card-meta">
+        <span class="swipe-card-price">${formatPrice(p.price)}</span>
+        ${p.size ? `<span class="swipe-card-size">${p.size}</span>` : ''}
+        <span class="swipe-card-location">📍 ${p.seller_location || 'Bakı'}</span>
+      </div>
+    </div>`;
+
+  // Click to view product
+  card.addEventListener('click', (e) => {
+    if (Math.abs(currentX - startX) < 5) {
+      location.href = 'product.html?id=' + p.id;
+    }
+  });
+
+  return card;
+}
+
+function setupDrag() {
+  const card = document.querySelector('.swipe-card.top');
+  if (!card) return;
+
+  // Touch events
+  card.addEventListener('touchstart', onDragStart, { passive: true });
+  card.addEventListener('touchmove', onDragMove, { passive: false });
+  card.addEventListener('touchend', onDragEnd);
+
+  // Mouse events
+  card.addEventListener('mousedown', onDragStart);
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('mouseup', onDragEnd);
+}
+
+function getXY(e) {
+  if (e.touches) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  return { x: e.clientX, y: e.clientY };
+}
+
+function onDragStart(e) {
+  isDragging = true;
+  const { x, y } = getXY(e);
+  startX = x; startY = y; currentX = x; currentY = y;
+}
+
+function onDragMove(e) {
+  if (!isDragging) return;
+  if (e.cancelable) e.preventDefault();
+  const { x, y } = getXY(e);
+  currentX = x; currentY = y;
+  const dx = currentX - startX;
+  const dy = currentY - startY;
+  const rotation = dx * 0.08;
+
+  const card = document.querySelector('.swipe-card.top');
+  if (!card) return;
+  card.style.transform = `translate(${dx}px, ${dy}px) rotate(${rotation}deg)`;
+  card.style.transition = 'none';
+
+  const p = products[currentIdx];
+  const likeOverlay = document.getElementById('overlay_like_' + p.id);
+  const nopeOverlay = document.getElementById('overlay_nope_' + p.id);
+  const superOverlay = document.getElementById('overlay_super_' + p.id);
+
+  const threshold = 60;
+  if (dx > threshold) {
+    likeOverlay.style.opacity = Math.min((dx - threshold) / 60, 1);
+    nopeOverlay.style.opacity = 0;
+    superOverlay.style.opacity = 0;
+  } else if (dx < -threshold) {
+    nopeOverlay.style.opacity = Math.min((-dx - threshold) / 60, 1);
+    likeOverlay.style.opacity = 0;
+    superOverlay.style.opacity = 0;
+  } else if (dy < -80) {
+    superOverlay.style.opacity = Math.min((-dy - 80) / 60, 1);
+    likeOverlay.style.opacity = 0;
+    nopeOverlay.style.opacity = 0;
+  } else {
+    likeOverlay.style.opacity = 0;
+    nopeOverlay.style.opacity = 0;
+    superOverlay.style.opacity = 0;
+  }
+}
+
+function onDragEnd(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+
+  const dx = currentX - startX;
+  const dy = currentY - startY;
+
+  if (dx > 100) { swipe('right'); }
+  else if (dx < -100) { swipe('left'); }
+  else if (dy < -120) { swipe('up'); }
+  else {
+    // Snap back
+    const card = document.querySelector('.swipe-card.top');
+    if (card) { card.style.transition = 'transform 0.3s'; card.style.transform = ''; }
+    const p = products[currentIdx];
+    if (p) {
+      document.getElementById('overlay_like_' + p.id).style.opacity = 0;
+      document.getElementById('overlay_nope_' + p.id).style.opacity = 0;
+      document.getElementById('overlay_super_' + p.id).style.opacity = 0;
+    }
+  }
+}
+
+async function swipe(direction) {
+  if (currentIdx >= products.length) return;
+  const p = products[currentIdx];
+  const card = document.querySelector('.swipe-card.top');
+  if (!card) return;
+
+  let action = direction === 'right' ? 'like' : direction === 'up' ? 'super' : 'dislike';
+  let tx = 0, ty = 0, rotation = 0;
+
+  if (direction === 'right') { tx = window.innerWidth + 100; rotation = 20; stats.liked++; }
+  else if (direction === 'left') { tx = -(window.innerWidth + 100); rotation = -20; stats.skipped++; }
+  else if (direction === 'up') { ty = -(window.innerHeight + 100); stats.liked++; }
+
+  // Animate out
+  card.style.transition = 'transform 0.35s ease-in, opacity 0.35s';
+  card.style.transform = `translate(${tx}px, ${ty}px) rotate(${rotation}deg)`;
+  card.style.opacity = '0';
+
+  // Save swipe
+  await db.from('swipe_history').insert({
+    user_id: currentUser.id,
+    product_id: p.id,
+    action
+  }).onConflict('user_id,product_id').ignore();
+
+  // If like or super, add to favorites
+  if (direction === 'right' || direction === 'up') {
+    await db.from('favorites').insert({ user_id: currentUser.id, product_id: p.id })
+      .onConflict('user_id,product_id').ignore();
+  }
+
+  // Update stats
+  document.getElementById('statLiked').textContent = stats.liked;
+  document.getElementById('statSkipped').textContent = stats.skipped;
+  document.getElementById('statMsg').textContent = stats.msg;
+
+  currentIdx++;
+  setTimeout(() => {
+    card.remove();
+    if (currentIdx >= products.length) { showEmpty(); return; }
+    renderCards();
+  }, 350);
+}
+
+function showEmpty() {
+  document.getElementById('cardStack').innerHTML = `
+    <div class="swipe-empty">
+      <div class="swipe-empty-icon">🎉</div>
+      <h3>Hamısını gördün!</h3>
+      <p>Bütün məhsulları keçdin. Daha çox məhsul üçün yenilə.</p>
+      <button class="btn-refresh" onclick="currentIdx=0;loadProducts()">Yenidən başla</button>
+    </div>`;
+  document.getElementById('swipeActions').style.display = 'none';
+}
+
+// MSG MODAL
+function openMsgModal() {
+  if (currentIdx >= products.length) return;
+  const p = products[currentIdx];
+  currentMsgProductId = p.id;
+  currentMsgSellerId = p.seller_id;
+  document.getElementById('msgSheetDesc').textContent = p.seller_name + ' · ' + p.title;
+  document.getElementById('msgText').value = '';
+  document.getElementById('msgModal').classList.add('open');
+}
+
+function closeMsgModal() {
+  document.getElementById('msgModal').classList.remove('open');
+}
+
+async function sendSwipeMsg() {
+  const text = document.getElementById('msgText').value.trim();
+  if (!text) return;
+  const { error } = await db.from('messages').insert({
+    product_id: currentMsgProductId,
+    sender_id: currentUser.id,
+    receiver_id: currentMsgSellerId,
+    content: text
+  });
+  if (!error) {
+    stats.msg++;
+    document.getElementById('statMsg').textContent = stats.msg;
+    closeMsgModal();
+    swipe('right');
+  }
+}
+
+document.getElementById('msgModal').addEventListener('click', function(e) {
+  if (e.target === this) closeMsgModal();
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') swipe('right');
+  else if (e.key === 'ArrowLeft') swipe('left');
+  else if (e.key === 'ArrowUp') swipe('up');
+});
+</script>
+
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.catalog-btn') && !e.target.closest('.catalog-dropdown')) {
+    document.querySelectorAll('.catalog-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+</script>
+
+</body>
+</html>
