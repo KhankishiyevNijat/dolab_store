@@ -397,10 +397,10 @@ async function loadCategories() {
   const container = document.getElementById('categoryOptions');
   container.innerHTML = cats.map(c => `
     <div class="filter-option">
-      <input type="checkbox" id="cat_${c.id}" value="${c.name}"
+      <input type="checkbox" id="cat_${escapeHtml(c.id)}" value="${escapeHtml(c.name)}"
         ${catParam === c.name ? 'checked' : ''}
         onchange="applyFilters()">
-      <label for="cat_${c.id}">${c.icon || ''} ${c.name}</label>
+      <label for="cat_${escapeHtml(c.id)}">${escapeHtml(c.icon || '')} ${escapeHtml(c.name)}</label>
     </div>
   `).join('');
 }
@@ -442,7 +442,7 @@ async function loadSheetCategories() {
   if (!cats) return;
   container.innerHTML = cats.map(c => `
     <button class="filter-chip ${catParam === c.name ? 'active' : ''}"
-      data-val="${c.name}" onclick="this.classList.toggle('active')">${c.icon || ''} ${c.name}</button>
+      data-val="${escapeHtml(c.name)}" onclick="this.classList.toggle('active')">${escapeHtml(c.icon || '')} ${escapeHtml(c.name)}</button>
   `).join('');
 }
 
