@@ -134,15 +134,75 @@
       </div>
     </div>
 
+    <!-- YENİ ŞİFRƏ TƏYİN ET (recovery) -->
+    <div id="resetForm" style="display:none;">
+      <h2 style="font-family:'Amatic SC',cursive;font-size:30px;font-weight:700;color:var(--navy);text-align:center;margin:0 0 6px;">Yeni şifrə təyin et</h2>
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin:0 0 24px;">Hesabınız üçün yeni şifrə daxil edin.</p>
+      <div class="form-group">
+        <label class="form-label">Yeni şifrə</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="newPassword" placeholder="Yeni şifrə (min 8 simvol)">
+          <button class="eye-btn" onclick="togglePw('newPassword',this)">👁</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Şifrəni təkrarla</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="newPasswordConfirm" placeholder="Şifrəni təkrarla">
+          <button class="eye-btn" onclick="togglePw('newPasswordConfirm',this)">👁</button>
+        </div>
+      </div>
+      <button class="btn-submit" id="resetBtn" onclick="doResetPassword()">Şifrəni yenilə</button>
+    </div>
+
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="assets/supabase-client.js"></script>
 <script>
-// Artıq daxil olubsa yönləndir
+// Recovery (şifrə bərpası) rejimini URL-dən aşkarla.
+// Link ya hash-da (type=recovery) ya da ?code=... şəklində gəlir.
+function isRecoveryUrl() {
+  const hash = window.location.hash || '';
+  const search = window.location.search || '';
+  return /type=recovery/.test(hash) || /[?&]code=/.test(search);
+}
+
+// Recovery vəziyyəti — onAuthStateChange PASSWORD_RECOVERY hadisəsi və ya URL
+let recoveryMode = isRecoveryUrl();
+
+// "Yeni şifrə" formasını göstər, login/register-i gizlət
+function showResetForm() {
+  recoveryMode = true;
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('resetForm').style.display = 'block';
+  const tabs = document.querySelector('.auth-tabs');
+  if (tabs) tabs.style.display = 'none';
+  clearAlerts();
+}
+
+// Supabase recovery linki açılanda PASSWORD_RECOVERY hadisəsini göndərir
+db.auth.onAuthStateChange((event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    showResetForm();
+  }
+});
+
+// Artıq daxil olubsa yönləndir — AMMA recovery rejimində YOX
 (async () => {
+  // URL recovery göstərirsə, formanı göstər və yönləndirmə
+  if (isRecoveryUrl()) {
+    showResetForm();
+    return;
+  }
   const user = await getCurrentUser();
+  // Recovery hadisəsi bu arada gəlmiş ola bilər — yenidən yoxla
+  if (recoveryMode) {
+    showResetForm();
+    return;
+  }
   if (user) location.href = 'index.html';
 })();
 
@@ -263,14 +323,40 @@ async function doGoogleLogin() {
 async function forgotPassword() {
   const email = document.getElementById('loginEmail').value.trim();
   if (!email) { showError('E-poçtunuzu daxil edib "Şifrəni unutmuşsunuz?" klikləyin.'); return; }
-  const { error } = await db.auth.resetPasswordForEmail(email);
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/login.html'
+  });
   if (!error) showSuccess('Şifrə sıfırlama linki e-poçtunuza göndərildi.');
+}
+
+async function doResetPassword() {
+  const newPassword = document.getElementById('newPassword').value;
+  const confirm = document.getElementById('newPasswordConfirm').value;
+  const btn = document.getElementById('resetBtn');
+
+  if (newPassword.length < 8) { showError('Şifrə minimum 8 simvol olmalıdır.'); return; }
+  if (newPassword !== confirm) { showError('Şifrələr uyğun gəlmir.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Gözləyin...';
+
+  const { error } = await db.auth.updateUser({ password: newPassword });
+
+  if (error) {
+    showError(error.message);
+    btn.disabled = false;
+    btn.textContent = 'Şifrəni yenilə';
+  } else {
+    showSuccess('Şifrəniz yeniləndi');
+    setTimeout(() => { location.href = 'index.html'; }, 1500);
+  }
 }
 
 // Enter key
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
-    if (document.getElementById('loginForm').style.display !== 'none') doLogin();
+    if (document.getElementById('resetForm').style.display !== 'none') doResetPassword();
+    else if (document.getElementById('loginForm').style.display !== 'none') doLogin();
     else doRegister();
   }
 });
