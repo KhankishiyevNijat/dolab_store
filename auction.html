@@ -403,9 +403,9 @@ function renderCard(a) {
   const isApproved = a.seller_approved_bid;
 
   return `
-    <div class="acard" onclick="openBidModal('${a.id}')">
+    <div class="acard" onclick="openBidModal('${jsString(a.id)}')">
       <div class="acard-img">
-        ${img ? `<img src="${img}" alt="${a.title}">` : '👗'}
+        ${img ? `<img src="${safeUrl(img)}" alt="${escapeHtml(a.title)}">` : '👗'}
         <span class="acard-type ${a.auction_type === 'timed' ? 'type-timed' : 'type-offer'}">
           ${a.auction_type === 'timed' ? '⏱ Vaxtlı' : '💬 Təklifli'}
         </span>
@@ -416,26 +416,26 @@ function renderCard(a) {
           </div>` : ''}
       </div>
       <div class="acard-body">
-        <div class="acard-brand">${a.brand || ''}</div>
-        <div class="acard-title">${a.title}</div>
+        <div class="acard-brand">${escapeHtml(a.brand || '')}</div>
+        <div class="acard-title">${escapeHtml(a.title)}</div>
         ${isApproved ? `<div class="seller-approved">✅ Satıcı bu qiymetə razıdır</div>` : ''}
         <div class="acard-prices">
           <div class="acard-current">
             <div class="acard-current-label">${a.bid_count > 0 ? 'Ən yüksək təklif' : 'Başlanğıc'}</div>
-            <div class="acard-current-price">₼${price}</div>
+            <div class="acard-current-price">₼${escapeHtml(price)}</div>
           </div>
           <div class="acard-start">
             <div class="acard-start-label">Başlanğıc</div>
-            <div class="acard-start-price">₼${a.start_price}</div>
+            <div class="acard-start-price">₼${escapeHtml(a.start_price)}</div>
           </div>
         </div>
         <div class="acard-meta">
           <div class="acard-bids"><span>${a.bid_count}</span> təklif</div>
           <div class="acard-seller">
             <div class="acard-seller-av">
-              ${a.seller_avatar ? `<img src="${a.seller_avatar}">` : '👤'}
+              ${a.seller_avatar ? `<img src="${safeUrl(a.seller_avatar)}">` : '👤'}
             </div>
-            ${a.seller_name || 'İstifadəçi'}
+            ${escapeHtml(a.seller_name || 'İstifadəçi')}
           </div>
         </div>
       </div>
@@ -474,11 +474,11 @@ async function renderBidModal(a) {
 
   document.getElementById('bidModalContent').innerHTML = `
     <div class="modal-img">
-      ${img ? `<img src="${img}" alt="${a.title}">` : '👗'}
+      ${img ? `<img src="${safeUrl(img)}" alt="${escapeHtml(a.title)}">` : '👗'}
     </div>
     <div class="modal-body">
-      <div class="modal-brand">${a.brand || ''} ${a.size ? '· ' + a.size : ''}</div>
-      <div class="modal-title">${a.title}</div>
+      <div class="modal-brand">${escapeHtml(a.brand || '')} ${a.size ? '· ' + escapeHtml(a.size) : ''}</div>
+      <div class="modal-title">${escapeHtml(a.title)}</div>
 
       ${isTimed ? `
         <div class="modal-timer-box">
@@ -497,11 +497,11 @@ async function renderBidModal(a) {
       <div class="modal-price-row">
         <div class="modal-price-box highlight">
           <div class="modal-price-box-label">${bids && bids.length > 0 ? 'Ən yüksək' : 'Başlanğıc'}</div>
-          <div class="modal-price-box-val">₼${price}</div>
+          <div class="modal-price-box-val">₼${escapeHtml(price)}</div>
         </div>
         <div class="modal-price-box">
           <div class="modal-price-box-label">Başlanğıc</div>
-          <div class="modal-price-box-val">₼${a.start_price}</div>
+          <div class="modal-price-box-val">₼${escapeHtml(a.start_price)}</div>
         </div>
         <div class="modal-price-box">
           <div class="modal-price-box-label">Təklif sayı</div>
@@ -520,15 +520,15 @@ async function renderBidModal(a) {
           ${bids.map((b, i) => `
             <div class="modal-bid-item">
               <div class="modal-bid-av">
-                ${b.bidder?.avatar_url ? `<img src="${b.bidder.avatar_url}">` : '👤'}
+                ${b.bidder?.avatar_url ? `<img src="${safeUrl(b.bidder.avatar_url)}">` : '👤'}
               </div>
               <div>
-                <div class="modal-bid-name">${b.bidder?.full_name || 'İstifadəçi'} ${i === 0 ? '🏆' : ''}</div>
+                <div class="modal-bid-name">${escapeHtml(b.bidder?.full_name || 'İstifadəçi')} ${i === 0 ? '🏆' : ''}</div>
                 <div class="modal-bid-time">${new Date(b.created_at).toLocaleString('en-GB')}</div>
               </div>
-              <div class="modal-bid-amount ${i === 0 ? 'top' : ''}">₼${b.amount}</div>
+              <div class="modal-bid-amount ${i === 0 ? 'top' : ''}">₼${escapeHtml(b.amount)}</div>
               ${isOwner && a.auction_type === 'offer' && !isApproved ? `
-                <button onclick="approveBid('${b.id}','${a.id}')" style="font-family:inherit;font-size:12px;color:white;background:#2ecc71;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;white-space:nowrap;">✅ Razıyam</button>
+                <button onclick="approveBid('${jsString(b.id)}','${jsString(a.id)}')" style="font-family:inherit;font-size:12px;color:white;background:#2ecc71;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;white-space:nowrap;">✅ Razıyam</button>
               ` : ''}
             </div>
           `).join('')}
@@ -539,10 +539,10 @@ async function renderBidModal(a) {
 
       ${isOwner ? `
         <div class="update-price-section">
-          <label>Minimum qiyməti dəyiş (cari: ₼${a.current_price})</label>
+          <label>Minimum qiyməti dəyiş (cari: ₼${escapeHtml(a.current_price)})</label>
           <div class="update-price-row">
             <input class="update-price-input" type="number" id="newMinPrice" placeholder="Yeni qiymət">
-            <button class="update-price-btn" onclick="updateMinPrice('${a.id}')">Yenilə</button>
+            <button class="update-price-btn" onclick="updateMinPrice('${jsString(a.id)}')">Yenilə</button>
           </div>
         </div>` : ''}
 
@@ -553,7 +553,7 @@ async function renderBidModal(a) {
           ` : `
             <div class="bid-input-row">
               <input class="bid-input" type="number" id="bidAmount" placeholder="₼${minBid}" min="${minBid}" step="${a.min_increment}">
-              <button class="bid-btn" onclick="submitBid('${a.id}',${minBid},${a.min_increment})">Təklif ver 🔨</button>
+              <button class="bid-btn" onclick="submitBid('${jsString(a.id)}',${minBid},${a.min_increment})">Təklif ver 🔨</button>
             </div>
             <div class="bid-hint">Minimum təklif: ₼${minBid} (min. artım: ₼${a.min_increment})</div>
           `}
@@ -562,8 +562,8 @@ async function renderBidModal(a) {
       ${ended && topBid ? `
         <div style="background:#d4f5e2;border:1px solid #2ecc71;border-radius:10px;padding:16px;text-align:center;">
           <div style="font-size:24px;margin-bottom:6px;">🏆</div>
-          <div style="font-size:15px;font-weight:400;color:#1a7a40;">${topBid.bidder?.full_name || 'İstifadəçi'} qalib gəldi!</div>
-          <div style="font-family:'Amatic SC',cursive;font-size:28px;color:var(--olive);">₼${topBid.amount}</div>
+          <div style="font-size:15px;font-weight:400;color:#1a7a40;">${escapeHtml(topBid.bidder?.full_name || 'İstifadəçi')} qalib gəldi!</div>
+          <div style="font-family:'Amatic SC',cursive;font-size:28px;color:var(--olive);">₼${escapeHtml(topBid.amount)}</div>
         </div>` : ''}
     </div>`;
 
@@ -654,7 +654,7 @@ async function openCreateModal() {
   const sel = document.getElementById('createProduct');
   sel.innerHTML = '<option value="">Məhsulunuzu seçin...</option>';
   (products || []).forEach(p => {
-    sel.innerHTML += `<option value="${p.id}">${p.title}</option>`;
+    sel.innerHTML += `<option value="${escapeHtml(p.id)}">${escapeHtml(p.title)}</option>`;
   });
 
   // Default ends_at: 24 saat sonra
